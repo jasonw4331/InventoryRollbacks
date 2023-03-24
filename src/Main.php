@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks;
 
+use jasonwynn10\InventoryRollbacks\event\EventListener;
 use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
-use jasonwynn10\InventoryRollbacks\task\SaveTransactionsTask;
 use libCustomPack\libCustomPack;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
 use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
 use muqsit\invmenu\type\util\InvMenuTypeBuilders;
+use pocketmine\block\utils\DyeColor;
 use pocketmine\block\VanillaBlocks;
-use pocketmine\inventory\SimpleInventory;
 use pocketmine\item\Item;
 use pocketmine\item\LegacyStringToItemParser;
 use pocketmine\item\StringToItemParser;
@@ -22,6 +22,7 @@ use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\resourcepacks\ZippedResourcePack;
+use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\TextFormat;
 use Symfony\Component\Filesystem\Path;
 use function array_fill;
@@ -63,7 +64,7 @@ final class Main extends PluginBase{
 		$this->getServer()->getCommandMap()->register($this->getName(), new command\RollbackInventory($this));
 
 		// register event listener
-		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+		new EventListener($this);
 
 		$this->saveResource('/lang/config.yml');
 		/** @var string[][] $contents */
@@ -120,97 +121,91 @@ final class Main extends PluginBase{
 		libCustomPack::unregisterResourcePack(self::$pack);
 		$this->getLogger()->debug('Resource pack uninstalled');
 
-		unlink(\Webmozart\PathUtil\Path::join($this->getDataFolder(), self::$pack->getPackName() . '.mcpack'));
+		unlink(Path::join($this->getDataFolder(), self::$pack->getPackName() . '.mcpack'));
 		$this->getLogger()->debug('Resource pack file deleted');
 		// TODO: handle saving of incremental transaction data
 	}
 
-	public function showTransactionsMenu(Player $viewer, Player $player, ?\DateTime $timestamp = null) : void{
-		$lang = $player->getLanguage();
+	public function showTransactionsMenu(Player $viewer, Player $player, int $timestamp) : void{
+		$lang = $viewer->getLanguage();
 
 		// identify padding item
 		$itemString = filter_var($this->getConfig()->get('Filler Item', 'black_stained_glass_pane'), options: FILTER_NULL_ON_FAILURE);
-		$item = StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString);
+		$item = $itemString === null ? VanillaBlocks::STAINED_GLASS_PANE()->setColor(DyeColor::BLACK())->asItem() :
+			(StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString));
 		$fillerItem = $item->setCustomName(' ');
 
 		// identify navigation items
-		$itemString = filter_var($this->getConfig()->get('Next Page Item', 'green_concrete'), options: FILTER_NULL_ON_FAILURE);
-		$item = StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString);
+		$itemString = filter_var($this->getConfig()->get('Next Page Item', 'lime_concrete'), options: FILTER_NULL_ON_FAILURE);
+		$item = $itemString === null ? VanillaBlocks::CONCRETE()->setColor(DyeColor::LIME())->asItem() :
+			(StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString));
 		$nextPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::menu_nextpage()));
 		$itemString = filter_var($this->getConfig()->get('Previous Page Item', 'red_concrete'), options: FILTER_NULL_ON_FAILURE);
-		$item = StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString);
+		$item = $itemString === null ? VanillaBlocks::CONCRETE()->setColor(DyeColor::RED())->asItem() :
+			(StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString));
 		$previousPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::menu_previouspage()));
 
 		// identify inventory contents
-		$inventoryContents = $timestamp === null ? $player->getInventory()->getContents(true) : ($this->getTimestampedInventories($player, $timestamp)[0]?->getContents(true) ?? []);
-		$armorInventoryContents = $timestamp === null ? $player->getArmorInventory()->getContents(true) : ($this->getTimestampedInventories($player, $timestamp)[1]?->getContents(true) ?? []);
-		$cursorInventoryContents = $timestamp === null ? $player->getCursorInventory()->getContents(true) : ($this->getTimestampedInventories($player, $timestamp)[2]?->getContents(true) ?? []);
-		$offHandInventoryContents = $timestamp === null ? $player->getOffHandInventory()->getContents(true) : ($this->getTimestampedInventories($player, $timestamp)[3]?->getContents(true) ?? []);
+		$inventories = InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp);
 
 		// create menu
 		$menu = InvMenu::create(self::TYPE_ROLLBACKS_VIEW);
 
 		// populate with padding items and previous inventories
-		$menu->getInventory()->setContents($this->compileMenuItems($fillerItem, $nextPageItem, $previousPageItem, $inventoryContents, $armorInventoryContents, $cursorInventoryContents, $offHandInventoryContents));
+		$menu->getInventory()->setContents($this->compileMenuItems($fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp, $inventories));
 
 		$menu->setListener(InvMenu::readonly(function(DeterministicInvMenuTransaction $transaction) use ($nextPageItem, $previousPageItem, $viewer, $player, $timestamp) : void{
-			if($transaction->getItemClicked()->equals($nextPageItem, false, false)){ // when next page item is clicked, show next page
-				// change bottom 4 row items to show next page inventory
-				$this->showTransactionsMenu($viewer, $player, $this->findPreviousTimestamp($player, $timestamp));
-			}elseif($transaction->getItemClicked()->equals($previousPageItem, false, false)){ // when previous page item is clicked, show previous page
-				// change bottom 4 row items to show previous inventory
-				$this->showTransactionsMenu($viewer, $player, $this->findNextTimestamp($player, $timestamp));
+			if($transaction->getItemClicked()->equals($nextPageItem, false, false)){
+				$this->showTransactionsMenu($viewer, $player, InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp));
+			}elseif($transaction->getItemClicked()->equals($previousPageItem, false, false)){
+				$this->showTransactionsMenu($viewer, $player, InventoryRecordHolder::getPreviousTimestamp($player->getName(), $timestamp));
 			}
 		}));
 
 		$menu->send($viewer);
 	}
 
-	public function saveTransactionsOfPlayer(Player $player) : bool{
-		// submit an async task which will save the player's transactions to disk as an NBT file
-		$this->getServer()->getAsyncPool()->submitTask(new SaveTransactionsTask($this, $player));
-		return true;
-	}
-
 	/**
-	 * @phpstan-param Item[] $playerInventoryItems
-	 * @phpstan-param array{
-	 *  0: Item,
-	 *  1: Item,
-	 *  2: Item,
-	 *  3: Item
-	 * }                     $armorInventoryItems
-	 * @phpstan-param array{
-	 *  0: Item,
-	 * }                     $cursorInventoryItems
-	 * @phpstan-param array{
-	 *  0: Item,
-	 * }
-	 *
 	 * @return Item[]
 	 */
-	private function compileMenuItems(Item $fillerItem, Item $nextPageItem, Item $previousPageItem, array $playerInventoryItems, array $armorInventoryItems, array $cursorInventoryItems, array $offHandItems) : array{
+	private function compileMenuItems(Item $fillerItem, Item $nextPageItem, Item $previousPageItem, Player $player, int $timestamp, MultiInventoryCapture $capture) : array{
+		$lang = $player->getLanguage();
+
+		$armorInventory = $capture->getArmorInventory()->getContents(true);
+		$cursorItem = $capture->getCursorInventory()->getItem(0);
+		$offHandItem = $capture->getOffHandInventory()->getItem(0);
+
 		$unorderedItemRows = [];
 		// separate player inventory into rows of 9
 		for($i = 0; $i < 4; $i++){
-			$unorderedItemRows[] = array_slice($playerInventoryItems, $i * 9, 9);
+			$unorderedItemRows[] = array_slice($capture->getInventory()->getContents(true), $i * 9, 9);
 		}
 
 		// name armor slots if air
-		foreach($armorInventoryItems as $slot => $item){
+		foreach($armorInventory as $slot => $item){
 			if($item->isNull()){
-				$armorInventoryItems[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName('Armor Slot ' . ($slot + 1));
+				$armorInventory[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(match ($slot){
+					0 => $lang->translate(CustomKnownTranslationFactory::menu_helmet()),
+					1 => $lang->translate(CustomKnownTranslationFactory::menu_chestplate()),
+					2 => $lang->translate(CustomKnownTranslationFactory::menu_leggings()),
+					3 => $lang->translate(CustomKnownTranslationFactory::menu_boots()),
+					default => throw new AssumptionFailedError('Invalid armor slot: ' . $slot)
+				});
 			}
 		}
 
 		// name cursor slot if air
-		if($cursorInventoryItems[0]->isNull()){
-			$cursorInventoryItems[0] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName('Cursor Slot');
+		if($cursorItem->isNull()){
+			$cursorItem = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(
+				$lang->translate(CustomKnownTranslationFactory::menu_cursorslot())
+			);
 		}
 
 		// name offhand slot if air
-		if($offHandItems[0]->isNull()){
-			$offHandItems[0] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName('Offhand Slot');
+		if($offHandItem->isNull()){
+			$offHandItem = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(
+				$lang->translate(CustomKnownTranslationFactory::menu_offhandslot())
+			);
 		}
 
 		// offset each row by 2 slots to account for padding
@@ -223,20 +218,20 @@ final class Main extends PluginBase{
 		$unorderedItemRows[] = array_fill(0, 13, $fillerItem);
 
 		// add page items to top row at indexes 3 and 10
-		$unorderedItemRows[4][3] = $previousPageItem;
-		$unorderedItemRows[4][9] = $nextPageItem;
+		$unorderedItemRows[4][3] = InventoryRecordHolder::getPreviousTimestamp($player->getName(), $timestamp) > -1 ? $previousPageItem : $fillerItem;
+		$unorderedItemRows[4][9] = InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp) !== time() ? $nextPageItem : $fillerItem;
 
 		// add armor at right-most side of 2nd row and below
-		$unorderedItemRows[1][12] = $armorInventoryItems[0];
-		$unorderedItemRows[2][12] = $armorInventoryItems[1];
-		$unorderedItemRows[3][12] = $armorInventoryItems[2];
-		$unorderedItemRows[0][12] = $armorInventoryItems[3];
+		$unorderedItemRows[1][12] = $armorInventory[0];
+		$unorderedItemRows[2][12] = $armorInventory[1];
+		$unorderedItemRows[3][12] = $armorInventory[2];
+		$unorderedItemRows[0][12] = $armorInventory[3];
 
 		// add armor items at left-most side of 3rd row
-		$unorderedItemRows[1][0] = $offHandItems[0];
+		$unorderedItemRows[1][0] = $offHandItem;
 
 		// add cursor items at left-most side of 5th row
-		$unorderedItemRows[3][0] = $cursorInventoryItems[0];
+		$unorderedItemRows[3][0] = $cursorItem;
 
 		// consolidate rows into single inventory
 		return [
@@ -247,25 +242,5 @@ final class Main extends PluginBase{
 			...array_values($unorderedItemRows[3]),
 			...array_values($unorderedItemRows[0]),
 		];
-	}
-
-	/**
-	 * @phpstan-return array{
-	 *     0: SimpleInventory|null,
-	 *     1: SimpleInventory|null,
-	 *     2: SimpleInventory|null,
-	 *     3: SimpleInventory|null
-	 * }
-	 */
-	private function getTimestampedInventories(Player $player, \DateTime $timestamp) : array{
-		return [];
-	}
-
-	private function findPreviousTimestamp(Player $player, ?\DateTime $timestamp = null) : ?\DateTime{
-		return null;
-	}
-
-	private function findNextTimestamp(Player $player, ?\DateTime $timestamp = null) : ?\DateTime{
-		return null;
 	}
 }
