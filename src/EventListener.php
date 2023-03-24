@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks;
@@ -9,7 +10,7 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\plugin\PluginOwnedTrait;
 
-class EventListener implements Listener {
+class EventListener implements Listener{
 	use PluginOwnedTrait;
 
 	/*public function onDataPacket(DataPacketSendEvent $event)  :void {

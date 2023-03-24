@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks;
@@ -23,10 +24,24 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\resourcepacks\ZippedResourcePack;
 use pocketmine\utils\TextFormat;
 use Symfony\Component\Filesystem\Path;
+use function array_fill;
+use function array_map;
+use function array_merge;
+use function array_pad;
+use function array_slice;
+use function array_values;
+use function filter_var;
+use function mb_strtolower;
+use function pathinfo;
+use function scandir;
+use function str_repeat;
+use function unlink;
+use function yaml_parse_file;
+use const FILTER_NULL_ON_FAILURE;
 
-final class Main extends PluginBase {
+final class Main extends PluginBase{
 
-	PUBLIC CONST TYPE_ROLLBACKS_VIEW = 'inventoryrollbacks:rollbacks_view';
+	public const TYPE_ROLLBACKS_VIEW = 'inventoryrollbacks:rollbacks_view';
 	private static array $languages = [];
 	private static ?ZippedResourcePack $pack;
 
@@ -105,7 +120,7 @@ final class Main extends PluginBase {
 		libCustomPack::unregisterResourcePack(self::$pack);
 		$this->getLogger()->debug('Resource pack uninstalled');
 
-		\unlink(\Webmozart\PathUtil\Path::join($this->getDataFolder(), self::$pack->getPackName() . '.mcpack'));
+		unlink(\Webmozart\PathUtil\Path::join($this->getDataFolder(), self::$pack->getPackName() . '.mcpack'));
 		$this->getLogger()->debug('Resource pack file deleted');
 		// TODO: handle saving of incremental transaction data
 	}
@@ -138,7 +153,7 @@ final class Main extends PluginBase {
 		// populate with padding items and previous inventories
 		$menu->getInventory()->setContents($this->compileMenuItems($fillerItem, $nextPageItem, $previousPageItem, $inventoryContents, $armorInventoryContents, $cursorInventoryContents, $offHandInventoryContents));
 
-		$menu->setListener(InvMenu::readonly(function(DeterministicInvMenuTransaction $transaction) use($nextPageItem, $previousPageItem, $viewer, $player, $timestamp) : void{
+		$menu->setListener(InvMenu::readonly(function(DeterministicInvMenuTransaction $transaction) use ($nextPageItem, $previousPageItem, $viewer, $player, $timestamp) : void{
 			if($transaction->getItemClicked()->equals($nextPageItem, false, false)){ // when next page item is clicked, show next page
 				// change bottom 4 row items to show next page inventory
 				$this->showTransactionsMenu($viewer, $player, $this->findPreviousTimestamp($player, $timestamp));
@@ -151,7 +166,7 @@ final class Main extends PluginBase {
 		$menu->send($viewer);
 	}
 
-	public function saveTransactionsOfPlayer(Player $player): bool {
+	public function saveTransactionsOfPlayer(Player $player) : bool{
 		// submit an async task which will save the player's transactions to disk as an NBT file
 		$this->getServer()->getAsyncPool()->submitTask(new SaveTransactionsTask($this, $player));
 		return true;
@@ -164,10 +179,10 @@ final class Main extends PluginBase {
 	 *  1: Item,
 	 *  2: Item,
 	 *  3: Item
-	 * } $armorInventoryItems
+	 * }                     $armorInventoryItems
 	 * @phpstan-param array{
 	 *  0: Item,
-	 * } $cursorInventoryItems
+	 * }                     $cursorInventoryItems
 	 * @phpstan-param array{
 	 *  0: Item,
 	 * }
@@ -184,7 +199,7 @@ final class Main extends PluginBase {
 		// name armor slots if air
 		foreach($armorInventoryItems as $slot => $item){
 			if($item->isNull()){
-				$armorInventoryItems[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName('Armor Slot '.($slot + 1));
+				$armorInventoryItems[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName('Armor Slot ' . ($slot + 1));
 			}
 		}
 

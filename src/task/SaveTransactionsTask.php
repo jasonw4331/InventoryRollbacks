@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\task;
@@ -17,7 +18,7 @@ class SaveTransactionsTask extends AsyncTask{
 	/**
 	 * Actions to execute when run
 	 */
-	public function onRun() : void {
+	public function onRun() : void{
 
 	}
 

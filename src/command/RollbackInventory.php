@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\command;
@@ -12,6 +13,7 @@ use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginOwned;
 use pocketmine\plugin\PluginOwnedTrait;
+use function count;
 
 class RollbackInventory extends Command implements PluginOwned{
 	use PluginOwnedTrait {
@@ -32,7 +34,7 @@ class RollbackInventory extends Command implements PluginOwned{
 	/**
 	 * @inheritDoc
 	 */
-	public function execute(CommandSender $sender, string $commandLabel, array $args): void{
+	public function execute(CommandSender $sender, string $commandLabel, array $args) : void{
 		if(!$this->testPermission($sender)){
 			return;
 		}
