@@ -1,28 +1,19 @@
-# ExamplePlugin
+# Inventory Rollbacks
+[![Discord](https://img.shields.io/badge/chat-on%20discord-7289da.svg)](https://discord.gg/R7kdetE)
+[![Poggit-Ci](https://poggit.pmmp.io/ci.shield/jasonwynn10/InventoryRollbacks/InventoryRollbacks)](https://poggit.pmmp.io/ci/jasonwynn10/InventoryRollbacks/InventoryRollbacks)
+[![Download count](https://poggit.pmmp.io/shield.dl.total/InventoryRollbacks)](https://poggit.pmmp.io/p/InventoryRollbacks)
 
-This repository contains a basic example of a modern PocketMine-MP plugin, and a handful of the API features.
+# Intro
+InventoryRollbacks is a plugin which tracks all inventory changes and allows you to roll any of them back to a previous state.
 
-## PHPStan analysis
-This repository shows an example setup for standalone local analysis of a plugin using [PHPStan](https://phpstan.org).
+# Features
+* adds the command: /rbi
 
-It uses [Composer](https://getcomposer.org) for autoloading, allowing you to install PHPStan extensions such as [phpstan-strict-rules](https://github.com/phpstan/phpstan-strict-rules). The configuration for this can be seen in [`phpstan/composer.json`](/phpstan/composer.json).
+# Permissions
+* `inventoryrollback.command` rollback command permission
 
-### Setting up PHPStan
-Assuming you have Composer and a compatible PHP binary available in your PATH, run:
-```
-cd phpstan
-composer install
-```
+# Future Additions
+* none planned. Leave requests in the reviews.
 
-Then you can run PHPStan exactly as you would with any other project:
-```
-vendor/bin/phpstan analyze
-```
-
-### Updating the dependencies
-```
-composer update
-```
-
-### GitHub Actions
-You can find a workflow suitable for analysing most plugins using this system in [`.github/workflows/main.yml`](/.github/workflows/main.yml).
+# About
+This plugin was released because no other inventory rollback plugins exist on poggit for some reason. Who would've guessed?

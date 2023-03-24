@@ -1,0 +1,29 @@
+{
+    "namespace": "chest",
+
+    "small_chest_screen@common.inventory_screen_common": {
+		"$close_on_player_hurt|default": true,
+		"close_on_player_hurt": "$close_on_player_hurt",
+
+		"$keyword0": "§r§r§r§r§r§r§r§r§r§r",
+
+		"variables": [
+			{
+				"requires": "$desktop_screen",
+				"$screen_content": "chest.small_chest_panel",
+				"$screen_bg_content": "common.screen_background"
+			},
+			{
+				"requires": "$pocket_screen",
+				"$screen_content": "pocket_containers.small_chest_panel"
+			},
+			{ // 13 * 6
+				"requires": "(not (($container_title - $keyword0) = $container_title))",
+				"$root_panel_size": [ 248, 220 ],
+				"$panel_top_half_size": [ "144%", 132 ],
+				"$scrolling_panel_size": [ 234, 108 ],
+				"$screen_content": "custom_scroll_screen.custom_scroll_panel"
+			}
+		]
+    }
+}
