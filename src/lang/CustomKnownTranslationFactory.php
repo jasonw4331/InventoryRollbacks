@@ -38,8 +38,24 @@ final class CustomKnownTranslationFactory{
 		]);
 	}
 
+	public static function menu_boots() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::MENU_BOOTS, []);
+	}
+
+	public static function menu_chestplate() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::MENU_CHESTPLATE, []);
+	}
+
 	public static function menu_cursorslot() : Translatable{
 		return new Translatable(CustomKnownTranslationKeys::MENU_CURSORSLOT, []);
+	}
+
+	public static function menu_helmet() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::MENU_HELMET, []);
+	}
+
+	public static function menu_leggings() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::MENU_LEGGINGS, []);
 	}
 
 	public static function menu_nextpage() : Translatable{
