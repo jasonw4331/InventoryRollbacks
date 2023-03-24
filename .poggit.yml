@@ -1,0 +1,22 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/Nicknames
+build-by-default: true
+projects:
+  Nicknames:
+    path: ""
+    icon: "icon.png"
+    lint: false
+    excludeDirs:
+      - tests
+      - .github
+      - build
+      - phpstan
+    excludeFiles:
+      - .gitignore
+      - CONTRIBUTING.md
+      - SECURITY.md
+    libs:
+      - src: sof3/await-generator/await-generator
+        version: ^3.1.0
+      - src: muqsit/invmenu/InvMenu
+        version: ^4.5.0
+...
