@@ -54,7 +54,7 @@ class RollbackInventory extends Command implements PluginOwned{
 		$this->plugin->showTransactionsMenu(
 			$sender,
 			$player,
-			isset($args[1]) ? (new \DateTime('now'))->sub(new \DateInterval($args[1])) : null
+			isset($args[1]) ? (new \DateTime())->sub(new \DateInterval($args[1]))->getTimestamp() : time()
 		);
 	}
 }
