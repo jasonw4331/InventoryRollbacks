@@ -202,7 +202,7 @@ final class Main extends PluginBase {
 
 		// add page items to top row at indexes 3 and 10
 		$unorderedItemRows[4][3] = $previousPageItem;
-		$unorderedItemRows[4][10] = $nextPageItem;
+		$unorderedItemRows[4][9] = $nextPageItem;
 
 		// add armor at right-most side of 2nd row and below
 		$unorderedItemRows[1][12] = $armorInventoryItems[0];
