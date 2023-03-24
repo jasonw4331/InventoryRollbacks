@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace jasonwynn10\InventoryRollbacks;
 
 use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
+use jasonwynn10\InventoryRollbacks\task\SaveTransactionsTask;
 use libCustomPack\libCustomPack;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
@@ -148,6 +149,12 @@ final class Main extends PluginBase {
 		}));
 
 		$menu->send($viewer);
+	}
+
+	public function saveTransactionsOfPlayer(Player $player): bool {
+		// submit an async task which will save the player's transactions to disk as an NBT file
+		$this->getServer()->getAsyncPool()->submitTask(new SaveTransactionsTask($this, $player));
+		return true;
 	}
 
 	/**
