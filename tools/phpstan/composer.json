@@ -1,11 +1,49 @@
 {
 	"name": "jasonwynn10/phpstan-plugin-config",
+	"repositories": [
+		{
+			"type": "package",
+			"package": {
+				"name": "muqsit/invmenu",
+				"version": "5.0.0",
+				"source": {
+					"url": "https://github.com/Muqsit/InvMenu.git",
+					"type": "git",
+					"reference": "master"
+				},
+				"autoload": {
+					"psr-4": {
+						"muqsit\\invmenu\\": "src/"
+					}
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
+				"name": "jasonwynn10/libcustompack",
+				"version": "0.1.1",
+				"source": {
+					"url": "https://github.com/jasonwynn10/libCustomPack.git",
+					"type": "git",
+					"reference": "master"
+				},
+				"autoload": {
+					"psr-4": {
+						"jasonwynn10\\libcustompack\\": "src/"
+					}
+				}
+			}
+		}
+	],
 	"require": {
 		"phpstan/phpstan": "1.4.6",
 		"pocketmine/pocketmine-mp": "4.0.0",
 		"phpstan/phpstan-strict-rules": "^1.0",
 		"phpstan/extension-installer": "^1.0",
-		"symfony/filesystem": "^5.4"
+		"symfony/filesystem": "^5.4",
+		"muqsit/invmenu": "*",
+		"jasonwynn10/libcustompack": "*"
 	},
 	"autoload": {
 		"psr-4": {

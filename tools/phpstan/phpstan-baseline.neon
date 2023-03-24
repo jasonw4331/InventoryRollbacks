@@ -1,27 +1,131 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Static property jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:\\$consoleCommandSender \\(pocketmine\\\\console\\\\ConsoleCommandSender\\) does not accept pocketmine\\\\command\\\\CommandSender\\.$#"
+			message: "#^Call to an undefined method pocketmine\\\\inventory\\\\transaction\\\\action\\\\InventoryAction\\:\\:getInventory\\(\\)\\.$#"
+			count: 1
+			path: ../../src/EventListener.php
+
+		-
+			message: "#^Call to an undefined method pocketmine\\\\inventory\\\\transaction\\\\action\\\\InventoryAction\\:\\:getSlot\\(\\)\\.$#"
+			count: 1
+			path: ../../src/EventListener.php
+
+		-
+			message: "#^Undefined variable\\: \\$player$#"
+			count: 1
+			path: ../../src/EventListener.php
+
+		-
+			message: "#^Call to method getItemClicked\\(\\) on an unknown class muqsit\\\\invmenu\\\\transaction\\\\DeterministicInvMenuTransaction\\.$#"
+			count: 2
+			path: ../../src/Main.php
+
+		-
+			message: "#^Call to static method ACTOR_FIXED\\(\\) on an unknown class muqsit\\\\invmenu\\\\type\\\\util\\\\InvMenuTypeBuilders\\.$#"
 			count: 1
 			path: ../../src/Main.php
 
 		-
-			message: "#^Call to an undefined method pocketmine\\\\plugin\\\\Plugin\\:\\:getWhoLastSent\\(\\)\\.$#"
+			message: "#^Call to static method create\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenu\\.$#"
 			count: 1
-			path: ../../src/commands/ReplyCommand.php
+			path: ../../src/Main.php
 
 		-
-			message: "#^Call to an undefined method pocketmine\\\\plugin\\\\Plugin\\:\\:onMessage\\(\\)\\.$#"
+			message: "#^Call to static method generatePackFromResources\\(\\) on an unknown class libCustomPack\\\\libCustomPack\\.$#"
 			count: 1
-			path: ../../src/commands/ReplyCommand.php
+			path: ../../src/Main.php
 
 		-
-			message: "#^Call to an undefined method pocketmine\\\\console\\\\ConsoleCommandSender\\|pocketmine\\\\player\\\\Player\\:\\:getDisplayName\\(\\)\\.$#"
-			count: 2
-			path: ../../src/commands/TellCommand.php
+			message: "#^Call to static method getTypeRegistry\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenuHandler\\.$#"
+			count: 1
+			path: ../../src/Main.php
 
 		-
-			message: "#^Call to an undefined method pocketmine\\\\plugin\\\\Plugin\\:\\:onMessage\\(\\)\\.$#"
+			message: "#^Call to static method isRegistered\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenuHandler\\.$#"
 			count: 1
-			path: ../../src/commands/TellCommand.php
+			path: ../../src/Main.php
+
+		-
+			message: "#^Call to static method readonly\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenu\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Call to static method register\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenuHandler\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Call to static method registerResourcePack\\(\\) on an unknown class libCustomPack\\\\libCustomPack\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Call to static method unregisterResourcePack\\(\\) on an unknown class libCustomPack\\\\libCustomPack\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Cannot call method getPackName\\(\\) on pocketmine\\\\resourcepacks\\\\ZippedResourcePack\\|null\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Method jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:compileMenuItems\\(\\) has parameter \\$offHandItems with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Method jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:findNextTimestamp\\(\\) never returns DateTime so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Method jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:findPreviousTimestamp\\(\\) never returns DateTime so it can be removed from the return type\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Method jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:getTimestampedInventories\\(\\) should return array\\{pocketmine\\\\inventory\\\\SimpleInventory\\|null, pocketmine\\\\inventory\\\\SimpleInventory\\|null, pocketmine\\\\inventory\\\\SimpleInventory\\|null, pocketmine\\\\inventory\\\\SimpleInventory\\|null\\} but returns array\\{\\}\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: """
+				#^PHPDoc tag @phpstan\\-param has invalid value \\(array\\{
+				 0\\: Item,
+				\\}\\)\\: Unexpected token "\\\\n\\\\t \\*", expected variable at offset 313$#
+			"""
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Parameter \\#5 \\$armorInventoryItems of method jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:compileMenuItems\\(\\) expects array\\{pocketmine\\\\item\\\\Item, pocketmine\\\\item\\\\Item, pocketmine\\\\item\\\\Item, pocketmine\\\\item\\\\Item\\}, array\\<pocketmine\\\\item\\\\Item\\> given\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Parameter \\#6 \\$cursorInventoryItems of method jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:compileMenuItems\\(\\) expects array\\{pocketmine\\\\item\\\\Item\\}, array\\<pocketmine\\\\item\\\\Item\\> given\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Parameter \\$transaction of anonymous function has invalid type muqsit\\\\invmenu\\\\transaction\\\\DeterministicInvMenuTransaction\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:\\$languages type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Constructor of class jasonwynn10\\\\InventoryRollbacks\\\\task\\\\SaveTransactionsTask has an unused parameter \\$player\\.$#"
+			count: 1
+			path: ../../src/task/SaveTransactionsTask.php
+
+		-
+			message: "#^Constructor of class jasonwynn10\\\\InventoryRollbacks\\\\task\\\\SaveTransactionsTask has an unused parameter \\$plugin\\.$#"
+			count: 1
+			path: ../../src/task/SaveTransactionsTask.php
 
