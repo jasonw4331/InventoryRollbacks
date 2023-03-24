@@ -1,3 +1,21 @@
+# InventoryRollbacks Configuration File
+
+# Logging Mode
+# Available Modes: Verbose, Backup, User-Select
+# Verbose: Logs all inventory changes
+# Backup: Logs only when items are created or destroyed
+# User-Select: Logs only when the action picked by the user occurs
+Logging Mode: Verbose
+
+
+# Filler Item
+# The decoration item used to fill in empty slots in the Rollback GUI
 Filler Item: black_stained_glass_pane
+
+# Next Page Item
+# The item used to go to the next page in the Rollback GUI
 Next Page Item: green_concrete
+
+# Previous Page Item
+# The item used to go to the previous page in the Rollback GUI
 Previous Page Item: red_concrete
