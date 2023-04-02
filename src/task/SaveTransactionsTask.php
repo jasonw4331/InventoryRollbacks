@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\task;
 
+use jasonwynn10\InventoryRollbacks\InventoryRecordHolder;
 use jasonwynn10\InventoryRollbacks\Main;
 use pocketmine\player\Player;
 use pocketmine\scheduler\AsyncTask;
@@ -19,7 +20,7 @@ class SaveTransactionsTask extends AsyncTask{
 	 * Actions to execute when run
 	 */
 	public function onRun() : void{
-
+		InventoryRecordHolder::writeInventoriesToDisk();
 	}
 
 	/**
