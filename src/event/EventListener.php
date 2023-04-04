@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\event;
 
-use jasonwynn10\InventoryRollbacks\InventoryRecordHolder;
+use jasonwynn10\InventoryRollbacks\data\InventoryRecordHolder;
 use jasonwynn10\InventoryRollbacks\Main;
 use jasonwynn10\InventoryRollbacks\task\SaveTransactionsTask;
 use pocketmine\event\inventory\InventoryTransactionEvent;

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks;
+namespace jasonwynn10\InventoryRollbacks\data;
 
 use pocketmine\inventory\SimpleInventory;
 
