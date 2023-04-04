@@ -46,6 +46,12 @@ final class CustomKnownTranslationFactory{
 		return new Translatable(CustomKnownTranslationKeys::MENU_CHESTPLATE, []);
 	}
 
+	public static function menu_confirmation(Translatable|string $param0) : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::MENU_CONFIRMATION, [
+			0 => $param0,
+		]);
+	}
+
 	public static function menu_cursorslot() : Translatable{
 		return new Translatable(CustomKnownTranslationKeys::MENU_CURSORSLOT, []);
 	}
