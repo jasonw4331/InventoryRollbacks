@@ -10,6 +10,8 @@ use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\PlayerOffHandInventory;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\item\Item;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\Server;
 use function array_keys;
 use function time;
 
@@ -23,6 +25,8 @@ final class InventoryRecordHolder{
 
 	/** @var Item[][][] */
 	private static array $playerInventories = [], $armorInventories = [], $cursorInventories = [], $offHandInventories = [];
+	/** @var MultiInventoryCapture[][] $captureCache */
+	private static array $captureCache = [];
 
 	public static function addInventoryChange(string $playerName, PlayerInventory|ArmorInventory|PlayerCursorInventory|PlayerOffHandInventory ...$inventories) : void{
 		// store inventories indexed by player name and timestamp
@@ -43,20 +47,86 @@ final class InventoryRecordHolder{
 	}
 
 	public static function getInventoriesNearTime(string $playerName, int $timestamp) : MultiInventoryCapture{
-		// get inventories that are closest to the given timestamp
-		// if there are no inventories of same type find next timestamp
-		// if there are no inventories of same type or next timestamp, return empty inventory
-		$playerInventories = self::$playerInventories[$playerName] ?? [];
-		$armorInventories = self::$armorInventories[$playerName] ?? [];
-		$cursorInventories = self::$cursorInventories[$playerName] ?? [];
-		$offHandInventories = self::$offHandInventories[$playerName] ?? [];
 
-		$playerInventory = self::getInventoryNearTime($timestamp, $playerInventories, self::PLAYER_INVENTORY_SIZE); // player inventory size
-		$armorInventory = self::getInventoryNearTime($timestamp, $armorInventories, self::ARMOR_INVENTORY_SIZE); // armor inventory size
-		$cursorInventory = self::getInventoryNearTime($timestamp, $cursorInventories, self::CURSOR_INVENTORY_SIZE); // cursor inventory size
-		$offHandInventory = self::getInventoryNearTime($timestamp, $offHandInventories, self::OFFHAND_INVENTORY_SIZE); // offhand inventory size
+		$capture = self::getCachedCaptureNearTime(self::$captureCache[$playerName] ?? [], $timestamp);
+		if($capture !== null){
+			return $capture;
+		}
 
-		return new MultiInventoryCapture($playerInventory, $armorInventory, $cursorInventory, $offHandInventory);
+		$playerInventory = null;
+		$armorInventory = null;
+		$cursorInventory = null;
+		$offHandInventory = null;
+		if($timestamp === time()) {
+			$player = Server::getInstance()->getPlayerExact($playerName);
+			if($player !== null) {
+				$playerInventoryItems = $player->getInventory()->getContents(true);
+				$armorInventoryItems = $player->getArmorInventory()->getContents(true);
+				$cursorInventoryItems = $player->getCursorInventory()->getContents(true);
+				$offHandInventoryItems = $player->getOffHandInventory()->getContents(true);
+
+				$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
+				$playerInventory->setContents($playerInventoryItems);
+				$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
+				$armorInventory->setContents($armorInventoryItems);
+				$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
+				$cursorInventory->setContents($cursorInventoryItems);
+				$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
+				$offHandInventory->setContents($offHandInventoryItems);
+			}else{
+				$offlineData = Server::getInstance()->getOfflinePlayerData($playerName);
+				if($offlineData !== null) {
+					$inventoryTag = $offlineData->getListTag('Inventory');
+					if($inventoryTag !== null){
+						$inventoryItems = [];
+						$armorInventoryItems = [];
+
+						/** @var CompoundTag $item */
+						foreach($inventoryTag as $i => $item){
+							$slot = $item->getByte(Item::TAG_SLOT);
+							if($slot >= 0 && $slot < 9){ //Hotbar
+								//Old hotbar saving stuff, ignore it
+							}elseif($slot >= 100 && $slot < 104){ //Armor
+								$armorInventoryItems[$slot - 100] = Item::nbtDeserialize($item);
+							}elseif($slot >= 9 && $slot < 36 + 9){
+								$inventoryItems[$slot - 9] = Item::nbtDeserialize($item);
+							}
+						}
+						$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
+						$playerInventory->setContents($inventoryItems);
+						$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
+						$armorInventory->setContents($armorInventoryItems);
+					}
+					$offHand = $offlineData->getCompoundTag('OffHandItem');
+					$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
+					if($offHand !== null){
+						$offHandInventory->setContents([Item::nbtDeserialize($offHand)]);
+					}
+				}
+			}
+		}else{
+			// get inventories that are closest to the given timestamp
+			// if there are no inventories of same type find next timestamp
+			// if there are no inventories of same type or next timestamp, return empty inventory
+			$playerInventories = self::$playerInventories[$playerName] ?? [];
+			$armorInventories = self::$armorInventories[$playerName] ?? [];
+			$cursorInventories = self::$cursorInventories[$playerName] ?? [];
+			$offHandInventories = self::$offHandInventories[$playerName] ?? [];
+
+			$playerInventory = self::getInventoryNearTime($timestamp, $playerInventories, self::PLAYER_INVENTORY_SIZE); // player inventory size
+			$armorInventory = self::getInventoryNearTime($timestamp, $armorInventories, self::ARMOR_INVENTORY_SIZE); // armor inventory size
+			$cursorInventory = self::getInventoryNearTime($timestamp, $cursorInventories, self::CURSOR_INVENTORY_SIZE); // cursor inventory size
+			$offHandInventory = self::getInventoryNearTime($timestamp, $offHandInventories, self::OFFHAND_INVENTORY_SIZE); // offhand inventory size
+		}
+
+		self::$captureCache[$playerName][$timestamp] = $capture = new MultiInventoryCapture(
+			$playerInventory,
+			$armorInventory,
+			$cursorInventory,
+			$offHandInventory
+		);
+
+		return $capture;
 	}
 
 	public static function importTimestampedIntoCache(string $playerName, int $timestamp, MultiInventoryCapture $inventory) : void{
@@ -92,8 +162,7 @@ final class InventoryRecordHolder{
 
 	public static function getNextTimestamp(string $playerName, int $timestamp) : int{
 		assert($timestamp > 0, "Timestamp must be greater than 0, got $timestamp");
-		assert(isset(self::$playerInventories[$playerName]) && isset(self::$armorInventories[$playerName]) && isset(self::$cursorInventories[$playerName]) && isset(self::$offHandInventories[$playerName]), "No records found for $playerName");
-		$timestamps = array_unique(array_keys(self::$playerInventories[$playerName]) + array_keys(self::$armorInventories[$playerName]) + array_keys(self::$cursorInventories[$playerName]) + array_keys(self::$offHandInventories[$playerName]), SORT_NUMERIC);
+		$timestamps = array_unique(array_keys(self::$playerInventories[$playerName] ?? []) + array_keys(self::$armorInventories[$playerName] ?? []) + array_keys(self::$cursorInventories[$playerName] ?? []) + array_keys(self::$offHandInventories[$playerName] ?? []), SORT_NUMERIC);
 		foreach($timestamps as $t){
 			if($t > $timestamp){
 				return $t;
@@ -104,8 +173,7 @@ final class InventoryRecordHolder{
 
 	public static function getPreviousTimestamp(string $playerName, int $timestamp) : int{
 		assert($timestamp > 0, "Timestamp must be greater than 0, got $timestamp");
-		assert(isset(self::$playerInventories[$playerName]) && isset(self::$armorInventories[$playerName]) && isset(self::$cursorInventories[$playerName]) && isset(self::$offHandInventories[$playerName]), "No records found for $playerName");
-		$timestamps = array_unique(array_keys(self::$playerInventories[$playerName]) + array_keys(self::$armorInventories[$playerName]) + array_keys(self::$cursorInventories[$playerName]) + array_keys(self::$offHandInventories[$playerName]), SORT_NUMERIC);
+		$timestamps = array_unique(array_keys(self::$playerInventories[$playerName] ?? []) + array_keys(self::$armorInventories[$playerName] ?? []) + array_keys(self::$cursorInventories[$playerName] ?? []) + array_keys(self::$offHandInventories[$playerName] ?? []), SORT_NUMERIC);
 		$return = -1;
 		foreach($timestamps as $t){
 			if($t > $return && $t < $timestamp){
@@ -156,5 +224,27 @@ final class InventoryRecordHolder{
 		}
 		$inventory->setContents($itemArray[$closestTimestamp]);
 		return $inventory;
+	}
+
+	/**
+	 * @param MultiInventoryCapture[]  $cachedCaptures
+	 */
+	private static function getCachedCaptureNearTime(array $cachedCaptures, int $timestamp) : ?MultiInventoryCapture{
+		if(isset($cachedCaptures[$timestamp])){
+			return $cachedCaptures[$timestamp];
+		}
+		$timestamps = array_keys($cachedCaptures);
+		$closestTimestamp = null;
+		foreach($timestamps as $t){
+			if($t < $timestamp){
+				$closestTimestamp = $t;
+			}
+			if($t > $timestamp)
+				break; // early loop exit
+		}
+		if($closestTimestamp === null){
+			return null;
+		}
+		return $cachedCaptures[$closestTimestamp];
 	}
 }
