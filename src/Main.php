@@ -52,7 +52,7 @@ final class Main extends PluginBase{
 		}
 
 		// register custom inventory menu compatible with increased inventory size
-		$menuType = InvMenuTypeBuilders::ACTOR_FIXED()->setNetworkWindowType(WindowTypes::CONTAINER)->setSize(6 * 13); // 6 rows of 13 slots meant to hold the 4x9 inventory of a player inventory with 2 slots padding all sides
+		$menuType = InvMenuTypeBuilders::ACTOR_FIXED()->setNetworkWindowType(WindowTypes::CONTAINER)->setSize(6 * 13); // 6 rows of 13 slots meant to hold the inventory of a player inventory with 2 slots padding top 3 sides
 		$menuType->getActorMetadata()->setString(EntityMetadataProperties::NAMETAG, str_repeat(TextFormat::RESET, 10));
 		InvMenuHandler::getTypeRegistry()->register(self::TYPE_ROLLBACKS_VIEW, $menuType->build());
 
