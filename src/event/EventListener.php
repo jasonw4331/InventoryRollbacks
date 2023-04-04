@@ -67,7 +67,7 @@ final class EventListener implements Listener{
 			}
 		}
 
-		$this->plugin->getScheduler()->scheduleTask(new ClosureTask(function() use($player, $clonedList) {
+		$this->plugin->getScheduler()->scheduleTask(new ClosureTask(static function() use($player, $clonedList) {
 			$inventories = [];
 			foreach($clonedList as $class){
 				if($class === PlayerInventory::class){
