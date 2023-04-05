@@ -176,7 +176,7 @@ final class InventoryRecordHolder{
 		$timestamps = array_unique(array_keys(self::$playerInventories[$playerName] ?? []) + array_keys(self::$armorInventories[$playerName] ?? []) + array_keys(self::$cursorInventories[$playerName] ?? []) + array_keys(self::$offHandInventories[$playerName] ?? []), SORT_NUMERIC);
 		$return = -1;
 		foreach($timestamps as $t){
-			if($t > $return && $t < $timestamp){
+			if($t < $timestamp && $t > $return){
 				$return = $t;
 			}
 			if($t >= $timestamp){
