@@ -1,7 +1,7 @@
---- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/Nicknames
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/InventoryRollbacks
 build-by-default: true
 projects:
-  Nicknames:
+  InventoryRollbacks:
     path: ""
     icon: "icon.png"
     lint: false
