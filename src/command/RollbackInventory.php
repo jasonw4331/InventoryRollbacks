@@ -6,6 +6,7 @@ namespace jasonwynn10\InventoryRollbacks\command;
 
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\constraint\InGameRequiredConstraint;
+use jasonwynn10\InventoryRollbacks\command\argument\ISO8601Argument;
 use jasonwynn10\InventoryRollbacks\command\argument\PlayerTargetArgument;
 use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
 use jasonwynn10\InventoryRollbacks\Main;
@@ -27,6 +28,7 @@ final class RollbackInventory extends BaseCommand{
 	protected function prepare() : void{
 		$this->setPermission("inventoryrollback.command");
 		$this->registerArgument(0, new PlayerTargetArgument('player', false));
+		$this->registerArgument(1, new ISO8601Argument('time', true));
 
 		$this->addConstraint(new InGameRequiredConstraint($this));
 	}
@@ -35,6 +37,7 @@ final class RollbackInventory extends BaseCommand{
 	 * @phpstan-param Player $sender
 	 * @phpstan-param array{
 	 *   "player": Player|null,
+	 *   "time": string|null
 	 * } $args
 	 */
 	public function onRun(CommandSender $sender, string $aliasUsed, array $args) : void{
@@ -46,7 +49,7 @@ final class RollbackInventory extends BaseCommand{
 		$this->plugin->showTransactionsMenu(
 			$sender,
 			$args['player'],
-			isset($args[1]) ? (new \DateTime())->sub(new \DateInterval($args[1]))->getTimestamp() : time()
+			isset($args[1]) ? (new \DateTime())->sub(new \DateInterval($args['time']))->getTimestamp() : time()
 		);
 	}
 }
