@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace jasonwynn10\InventoryRollbacks;
 
 use CortexPE\Commando\PacketHooker;
+use jasonwynn10\InventoryRollbacks\data\InventoryRecordHolder;
+use jasonwynn10\InventoryRollbacks\data\MultiInventoryCapture;
 use jasonwynn10\InventoryRollbacks\event\EventListener;
 use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
 use libCustomPack\libCustomPack;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;
-use muqsit\invmenu\transaction\DeterministicInvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransaction;
+use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\util\InvMenuTypeBuilders;
 use pocketmine\block\utils\DyeColor;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\item\LegacyStringToItemParser;
 use pocketmine\item\StringToItemParser;
@@ -145,22 +149,40 @@ final class Main extends PluginBase{
 			(StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString));
 		$previousPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::menu_previouspage()));
 
-		// identify inventory contents
-		$inventories = InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp);
-
 		// create menu
 		$menu = InvMenu::create(self::TYPE_ROLLBACKS_VIEW);
 
-		// populate with padding items and previous inventories
-		$menu->getInventory()->setContents($this->compileMenuItems($fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp, $inventories));
+		// populate with padding items and inventory contents
+		$menu->getInventory()->setContents($this->compileMenuItems(
+			$fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp,
+			InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)
+		));
 
-		$menu->setListener(InvMenu::readonly(function(DeterministicInvMenuTransaction $transaction) use ($nextPageItem, $previousPageItem, $viewer, $player, $timestamp) : void{
-			if($transaction->getItemClicked()->equals($nextPageItem, false, false)){
-				$this->showTransactionsMenu($viewer, $player, InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp));
-			}elseif($transaction->getItemClicked()->equals($previousPageItem, false, false)){
-				$this->showTransactionsMenu($viewer, $player, InventoryRecordHolder::getPreviousTimestamp($player->getName(), $timestamp));
+		$menu->setListener(
+			function(InvMenuTransaction $transaction) use ($fillerItem, $nextPageItem, $previousPageItem, $player, &$timestamp) : InvMenuTransactionResult{
+				$result = $transaction->discard();
+				if($transaction->getOut()->equals($previousPageItem, true, false)){
+					$result->then(function(Player $viewer) use ($fillerItem, $nextPageItem, $previousPageItem, $player, &$timestamp) : void{
+						$timestamp = InventoryRecordHolder::getPreviousTimestamp($player->getName(), $timestamp);
+						$viewer->getCurrentWindow()->setContents($this->compileMenuItems(
+							$fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp,
+							InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)
+						));
+					});
+				}elseif($transaction->getOut()->equals($nextPageItem, true, false)){
+					$result->then(function(Player $viewer) use ($fillerItem, $nextPageItem, $previousPageItem, $player, &$timestamp) : void{
+						$timestamp = InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp);
+						$viewer->getCurrentWindow()->setContents($this->compileMenuItems(
+							$fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp,
+							InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)
+						));
+					});
+				}
+				return $result;
 			}
-		}));
+		);
+
+		$menu->setInventoryCloseListener(static fn(Player $player, Inventory $inventory) => $player->sendMessage(CustomKnownTranslationFactory::menu_confirmation($player->getDisplayName())));
 
 		$menu->send($viewer);
 	}
