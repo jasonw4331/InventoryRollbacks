@@ -4,56 +4,48 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\command;
 
+use CortexPE\Commando\BaseCommand;
+use CortexPE\Commando\constraint\InGameRequiredConstraint;
+use jasonwynn10\InventoryRollbacks\command\argument\PlayerTargetArgument;
 use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
 use jasonwynn10\InventoryRollbacks\Main;
-use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\utils\InvalidCommandSyntaxException;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\player\Player;
-use pocketmine\plugin\PluginOwned;
-use pocketmine\plugin\PluginOwnedTrait;
-use function count;
 
-class RollbackInventory extends Command implements PluginOwned{
-	use PluginOwnedTrait {
-		__construct as setOwningPlugin;
-	}
+final class RollbackInventory extends BaseCommand{
 
 	public function __construct(private Main $plugin){
 		parent::__construct(
+			$plugin,
 			"rollbackinventory",
 			CustomKnownTranslationFactory::command_rollbackinventory_description(),
-			CustomKnownTranslationFactory::command_rollbackinventory_usage(), // TODO: add time command constraint for formatting time in standard time format
 			["rbi"]
 		);
+	}
+
+	protected function prepare() : void{
 		$this->setPermission("inventoryrollback.command");
-		$this->setOwningPlugin($plugin);
+		$this->registerArgument(0, new PlayerTargetArgument('player', false));
+
+		$this->addConstraint(new InGameRequiredConstraint($this));
 	}
 
 	/**
-	 * @inheritDoc
+	 * @phpstan-param Player $sender
+	 * @phpstan-param array{
+	 *   "player": Player|null,
+	 * } $args
 	 */
-	public function execute(CommandSender $sender, string $commandLabel, array $args) : void{
-		if(!$this->testPermission($sender)){
-			return;
-		}
-		if(count($args) < 1){
-			throw new InvalidCommandSyntaxException();
-		}
-		if(!$sender instanceof Player){
-			$sender->sendMessage(KnownTranslationFactory::commands_generic_permission()); // TODO: replace with custom message about console not being able to use this command
-			return;
-		}
-		$player = $this->plugin->getServer()->getPlayerByPrefix($args[0]);
-		if($player === null){
+	public function onRun(CommandSender $sender, string $aliasUsed, array $args) : void{
+		if($args['player'] === null){
 			$sender->sendMessage(KnownTranslationFactory::commands_generic_player_notFound());
 			return;
 		}
 
 		$this->plugin->showTransactionsMenu(
 			$sender,
-			$player,
+			$args['player'],
 			isset($args[1]) ? (new \DateTime())->sub(new \DateInterval($args[1]))->getTimestamp() : time()
 		);
 	}

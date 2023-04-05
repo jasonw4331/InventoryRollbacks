@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks;
 
+use CortexPE\Commando\PacketHooker;
 use jasonwynn10\InventoryRollbacks\event\EventListener;
 use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
 use libCustomPack\libCustomPack;
@@ -50,6 +51,7 @@ final class Main extends PluginBase{
 		if(!InvMenuHandler::isRegistered()){
 			InvMenuHandler::register($this);
 		}
+		PacketHooker::register($this);
 
 		// register custom inventory menu compatible with increased inventory size
 		$menuType = InvMenuTypeBuilders::ACTOR_FIXED()->setNetworkWindowType(WindowTypes::CONTAINER)->setSize(6 * 13); // 6 rows of 13 slots meant to hold the inventory of a player inventory with 2 slots padding top 3 sides
