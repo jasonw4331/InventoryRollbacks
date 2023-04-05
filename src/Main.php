@@ -48,9 +48,7 @@ final class Main extends PluginBase{
 	private static ?ZippedResourcePack $pack;
 
 	public function onEnable() : void{
-		if(!InvMenuHandler::isRegistered()){
-			InvMenuHandler::register($this);
-		}
+		InvMenuHandler::register($this);
 		PacketHooker::register($this);
 
 		// register custom inventory menu compatible with increased inventory size
