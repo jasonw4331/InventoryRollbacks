@@ -12,6 +12,7 @@ use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
 use jasonwynn10\InventoryRollbacks\Main;
 use pocketmine\command\CommandSender;
 use pocketmine\lang\KnownTranslationFactory;
+use pocketmine\player\OfflinePlayer;
 use pocketmine\player\Player;
 
 final class RollbackInventory extends BaseCommand{
@@ -36,7 +37,7 @@ final class RollbackInventory extends BaseCommand{
 	/**
 	 * @phpstan-param Player $sender
 	 * @phpstan-param array{
-	 *   "player": Player|null,
+	 *   "player": OfflinePlayer|Player|null,
 	 *   "time": string|null
 	 * } $args
 	 */

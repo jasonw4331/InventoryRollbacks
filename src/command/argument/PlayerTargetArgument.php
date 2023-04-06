@@ -21,7 +21,7 @@ final class PlayerTargetArgument extends BaseArgument{
 	}
 
 	public function parse(string $argument, CommandSender $sender) : mixed{
-		return Server::getInstance()->getPlayerExact($argument);
+		return Server::getInstance()->getOfflinePlayer($argument);
 	}
 
 	public function getTypeName() : string{
