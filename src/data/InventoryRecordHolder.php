@@ -101,19 +101,19 @@ final class InventoryRecordHolder{
 
 		$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
 		$playerInventory->setContents(
-			self::$playerInventories[$playerName][$timestamp] = $inventory->getInventory()->getContents(true)
+			self::$playerInventories[$playerName][$timestamp] = $inventory->getInventory()->getContents()
 		);
 		$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
 		$armorInventory->setContents(
-			self::$armorInventories[$playerName][$timestamp] = $inventory->getArmorInventory()->getContents(true)
+			self::$armorInventories[$playerName][$timestamp] = $inventory->getArmorInventory()->getContents()
 		);
 		$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
 		$cursorInventory->setContents(
-			self::$cursorInventories[$playerName][$timestamp] = $inventory->getCursorInventory()->getContents(true)
+			self::$cursorInventories[$playerName][$timestamp] = $inventory->getCursorInventory()->getContents()
 		);
 		$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
 		$offHandInventory->setContents(
-			self::$offHandInventories[$playerName][$timestamp] = $inventory->getOffHandInventory()->getContents(true)
+			self::$offHandInventories[$playerName][$timestamp] = $inventory->getOffHandInventory()->getContents()
 		);
 
 		self::pushCaptureToCache($playerName, $timestamp, new MultiInventoryCapture(
