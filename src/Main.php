@@ -76,7 +76,7 @@ final class Main extends PluginBase{
 		$languageAliases = [];
 		foreach($contents as $language => $aliases){
 			$mini = mb_strtolower($aliases['mini']);
-			$this->saveResource('/lang/data/' . $mini . '.ini');
+			$this->saveResource('/lang/data/' . $mini . '.ini', true);
 			$languageAliases[$mini] = $language;
 		}
 
