@@ -6,7 +6,6 @@ namespace jasonwynn10\InventoryRollbacks\event;
 
 use jasonwynn10\InventoryRollbacks\data\InventoryRecordHolder;
 use jasonwynn10\InventoryRollbacks\Main;
-use jasonwynn10\InventoryRollbacks\task\SaveTransactionsTask;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -15,8 +14,17 @@ use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\PlayerCursorInventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\PlayerOffHandInventory;
+use pocketmine\nbt\BigEndianNbtSerializer;
+use pocketmine\nbt\NBT;
+use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\TreeRoot;
 use pocketmine\scheduler\ClosureTask;
+use pocketmine\utils\Filesystem;
+use pocketmine\utils\Utils;
+use Symfony\Component\Filesystem\Path;
 use function get_class;
+use function zlib_encode;
+use const ZLIB_ENCODING_GZIP;
 
 final class EventListener implements Listener{
 
@@ -84,9 +92,24 @@ final class EventListener implements Listener{
 	}
 
 	public function onPlayerQuit(PlayerQuitEvent $event) : void{
-		// save all transactions to nbt files
-		// clear all transactions from memory
-
-		$this->plugin->getServer()->getAsyncPool()->submitTask(new SaveTransactionsTask($this->plugin, $player));
+		// acquire cached inventory captures
+		$inventoryCaptures = InventoryRecordHolder::extractInventoryCaptures($event->getPlayer()->getName());
+		// clear cached inventory captures from memory
+		InventoryRecordHolder::clearCaches($event->getPlayer()->getName());
+		// convert inventory captures to compound tag
+		$captures = [];
+		foreach($inventoryCaptures as $inventoryCapture){
+			$captures[] = $inventoryCapture->getCompoundTag();
+		}
+		// write tag to NBT file
+		$contents = Utils::assumeNotFalse(zlib_encode(
+			(new BigEndianNbtSerializer())->write(new TreeRoot(new ListTag($captures, NBT::TAG_Compound))),
+			ZLIB_ENCODING_GZIP
+		), "zlib_encode() failed unexpectedly");
+		try{
+			Filesystem::safeFilePutContents(Path::join($this->plugin->getDataFolder(), 'captures', $event->getPlayer()->getName() . '.nbt'), $contents);
+		}catch(\RuntimeException $e){
+			// TODO
+		}
 	}
 }
