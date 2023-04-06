@@ -24,8 +24,17 @@ use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Filesystem;
 use pocketmine\utils\Utils;
 use Symfony\Component\Filesystem\Path;
+use function array_filter;
+use function array_slice;
 use function get_class;
+use function is_dir;
+use function mkdir;
+use function rename;
+use function rsort;
+use function scandir;
+use function zlib_decode;
 use function zlib_encode;
+use const SORT_NATURAL;
 use const ZLIB_ENCODING_GZIP;
 
 final class EventListener implements Listener{
@@ -56,7 +65,7 @@ final class EventListener implements Listener{
 		}
 		// find 5 files with most recent timestamp
 		$files = scandir($path);
-		$files = array_filter($files, static fn(string $file) => $file !== '.' and $file !== '..');
+		$files = array_filter($files, static fn(string $file) => $file !== '.' && $file !== '..');
 		rsort($files, SORT_NATURAL);
 		$files = array_slice($files, 0, 5);
 		// load records from files
@@ -142,7 +151,7 @@ final class EventListener implements Listener{
 				ZLIB_ENCODING_GZIP
 			), "zlib_encode() failed unexpectedly");
 			try{
-				Filesystem::safeFilePutContents(Path::join($this->plugin->getDataFolder(), 'captures', $event->getPlayer()->getName(), $timestamp.'.nbt'), $contents);
+				Filesystem::safeFilePutContents(Path::join($this->plugin->getDataFolder(), 'captures', $event->getPlayer()->getName(), $timestamp . '.nbt'), $contents);
 			}catch(\RuntimeException $e){
 				// TODO
 			}
