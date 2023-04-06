@@ -69,7 +69,7 @@ final class Main extends PluginBase{
 		// register event listener
 		new EventListener($this);
 
-		$this->saveResource('/lang/config.yml');
+		$this->saveResource('/lang/config.yml', true);
 		/** @var string[][] $contents */
 		$contents = yaml_parse_file(Path::join($this->getDataFolder(), "lang", 'config.yml'));
 		$languageAliases = [];
