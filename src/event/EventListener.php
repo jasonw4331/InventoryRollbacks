@@ -56,13 +56,8 @@ final class EventListener implements Listener{
 		}
 		// find 5 files with most recent timestamp
 		$files = scandir($path);
-		$files = array_filter($files, static function(string $file) : bool{
-			return $file !== '.' and $file !== '..';
-		});
-		$files = array_map(static function(string $file) : int{
-			return (int) $file;
-		}, $files);
-		rsort($files);
+		$files = array_filter($files, static fn(string $file) => $file !== '.' and $file !== '..');
+		rsort($files, SORT_NATURAL);
 		$files = array_slice($files, 0, 5);
 		// load records from files
 		foreach($files as $file){
