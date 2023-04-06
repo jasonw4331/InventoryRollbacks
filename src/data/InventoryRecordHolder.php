@@ -206,7 +206,35 @@ final class InventoryRecordHolder{
 		}
 	}
 
-	public static function clearCaches(string $playerName) : void{
+	public static function clearCaches(string $playerName, ?int $afterTimestamp = null) : void{
+		if($afterTimestamp !== null) {
+			foreach (self::$playerInventories[$playerName] ?? [] as $timestamp => $inventory) {
+				if ($timestamp >= $afterTimestamp) {
+					unset(self::$playerInventories[$playerName][$timestamp]);
+				}
+			}
+			foreach (self::$armorInventories[$playerName] ?? [] as $timestamp => $inventory) {
+				if ($timestamp >= $afterTimestamp) {
+					unset(self::$armorInventories[$playerName][$timestamp]);
+				}
+			}
+			foreach (self::$cursorInventories[$playerName] ?? [] as $timestamp => $inventory) {
+				if ($timestamp >= $afterTimestamp) {
+					unset(self::$cursorInventories[$playerName][$timestamp]);
+				}
+			}
+			foreach (self::$offHandInventories[$playerName] ?? [] as $timestamp => $inventory) {
+				if ($timestamp >= $afterTimestamp) {
+					unset(self::$offHandInventories[$playerName][$timestamp]);
+				}
+			}
+			foreach(self::$captureCache[$playerName] ?? [] as $timestamp => $capture){
+				if($timestamp >= $afterTimestamp){
+					unset(self::$captureCache[$playerName][$timestamp]);
+				}
+			}
+			return;
+		}
 		unset(self::$playerInventories[$playerName]);
 		unset(self::$armorInventories[$playerName]);
 		unset(self::$cursorInventories[$playerName]);

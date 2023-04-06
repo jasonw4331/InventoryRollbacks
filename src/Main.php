@@ -17,6 +17,10 @@ use muqsit\invmenu\transaction\InvMenuTransactionResult;
 use muqsit\invmenu\type\util\InvMenuTypeBuilders;
 use pocketmine\block\utils\DyeColor;
 use pocketmine\block\VanillaBlocks;
+use pocketmine\event\EventPriority;
+use pocketmine\event\HandlerListManager;
+use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\event\RegisteredListener;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\item\LegacyStringToItemParser;
@@ -193,6 +197,22 @@ final class Main extends PluginBase{
 		});
 
 		$menu->send($viewer);
+
+		/** @var RegisteredListener $listener */
+		$listener = null;
+		$listener = $this->getServer()->getPluginManager()->registerEvent(PlayerChatEvent::class, function(PlayerChatEvent $event) use ($viewer, $player, &$timestamp, &$listener) {
+			if($event->getPlayer() === $viewer) {
+				if(mb_strtolower($event->getMessage()) === 'y') {
+					// handle rollback
+					InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)->restore($player);
+					// clear cache after timestamp
+					InventoryRecordHolder::clearCaches($player->getName(), $timestamp);
+				}
+				$event->cancel();
+				// unregister event listener
+				HandlerListManager::global()->getListFor($event::class)->unregister($listener);
+			}
+		}, EventPriority::LOWEST, $this, true);
 	}
 
 	/**
