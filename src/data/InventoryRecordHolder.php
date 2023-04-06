@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\data;
 
+use jasonwynn10\InventoryRollbacks\util\CaptureConverter;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\PlayerCursorInventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\PlayerOffHandInventory;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\item\Item;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
 use function array_keys;
 use function array_shift;
@@ -62,45 +62,20 @@ final class InventoryRecordHolder{
 		}
 
 		if($timestamp === time()){
-			$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
-			$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
-			$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
-			$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
-
 			$player = Server::getInstance()->getPlayerExact($playerName);
-			if($player !== null){
-				$playerInventory->setContents($player->getInventory()->getContents(true));
-				$armorInventory->setContents($player->getArmorInventory()->getContents(true));
-				$cursorInventory->setContents($player->getCursorInventory()->getContents(true));
-				$offHandInventory->setContents($player->getOffHandInventory()->getContents(true));
-			}else{
+			if($player === null){
 				$offlineData = Server::getInstance()->getOfflinePlayerData($playerName);
-				if($offlineData !== null){
-					$inventoryTag = $offlineData->getListTag('Inventory');
-					if($inventoryTag !== null){
-						$inventoryItems = [];
-						$armorInventoryItems = [];
-
-						/** @var CompoundTag $item */
-						foreach($inventoryTag as $i => $item){
-							$slot = $item->getByte(Item::TAG_SLOT);
-							if($slot >= 0 && $slot < 9){ //Hotbar
-								//Old hotbar saving stuff, ignore it
-							}elseif($slot >= 100 && $slot < 104){ //Armor
-								$armorInventoryItems[$slot - 100] = Item::nbtDeserialize($item);
-							}elseif($slot >= 9 && $slot < self::PLAYER_INVENTORY_SIZE + 9){
-								$inventoryItems[$slot - 9] = Item::nbtDeserialize($item);
-							}
-						}
-						$playerInventory->setContents($inventoryItems);
-						$armorInventory->setContents($armorInventoryItems);
-					}
-					$offHand = $offlineData->getCompoundTag('OffHandItem');
-					if($offHand !== null){
-						$offHandInventory->setContents([Item::nbtDeserialize($offHand)]);
-					}
-				}
+				self::pushCaptureToCache($playerName, $timestamp, $capture = CaptureConverter::fromNBT($offlineData, true));
+				return $capture;
 			}
+			$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
+			$playerInventory->setContents($player->getInventory()->getContents());
+			$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
+			$armorInventory->setContents($player->getArmorInventory()->getContents());
+			$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
+			$cursorInventory->setContents($player->getCursorInventory()->getContents());
+			$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
+			$offHandInventory->setContents($player->getOffHandInventory()->getContents());
 		}else{
 			// get inventories that are closest to the given timestamp
 			// if there are no inventories of same type find next timestamp

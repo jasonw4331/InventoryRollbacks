@@ -98,8 +98,10 @@ final class EventListener implements Listener{
 		InventoryRecordHolder::clearCaches($event->getPlayer()->getName());
 		// convert inventory captures to compound tag
 		$captures = [];
-		foreach($inventoryCaptures as $inventoryCapture){
-			$captures[] = $inventoryCapture->getCompoundTag();
+		foreach($inventoryCaptures as $timestamp => $inventoryCapture){
+			$tag = CaptureConverter::toNBT($inventoryCapture, true);
+			$tag->setInt('timestamp', $timestamp);
+			$captures[] = $tag;
 		}
 		// write tag to NBT file
 		$contents = Utils::assumeNotFalse(zlib_encode(

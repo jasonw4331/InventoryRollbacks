@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\data;
 
+use jasonwynn10\InventoryRollbacks\util\CaptureConverter;
 use pocketmine\inventory\SimpleInventory;
-use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\CompoundTag;
-use pocketmine\nbt\tag\ListTag;
 use pocketmine\player\IPlayer;
 use pocketmine\player\OfflinePlayer;
 use pocketmine\player\Player;
@@ -51,39 +50,10 @@ final class MultiInventoryCapture{
 			$refClass->setAccessible(true);
 			/** @var CompoundTag $nbt */
 			$nbt = $refClass->getValue($player);
-			// set inventories
-			$inventoryTag = new ListTag([], NBT::TAG_Compound);
-			$nbt->setTag('Inventory', $inventoryTag);
-			if($this->inventory !== null){
-				//Normal inventory
-				$slotCount = $this->inventory->getSize() + 9;
-				for($slot = 9; $slot < $slotCount; ++$slot){
-					$item = $this->inventory->getItem($slot - 9);
-					if(!$item->isNull()){
-						$inventoryTag->push($item->nbtSerialize($slot));
-					}
-				}
-
-				//Armor
-				for($slot = 100; $slot < 104; ++$slot){
-					$item = $this->armorInventory->getItem($slot - 100);
-					if(!$item->isNull()){
-						$inventoryTag->push($item->nbtSerialize($slot));
-					}
-				}
-			}
-			$offHandItem = $this->offHandInventory->getItem(0);
-			if(!$offHandItem->isNull()){
-				$nbt->setTag('OffHandItem', $offHandItem->nbtSerialize());
-			}
+			$nbt->merge(CaptureConverter::toNBT($this));
 			// write to disk
 			Server::getInstance()->saveOfflinePlayerData($player->getName(), $nbt);
 		}
-	}
-
-	public function getCompoundTag() : CompoundTag{
-		$nbt = CompoundTag::create();
-
 	}
 
 }
