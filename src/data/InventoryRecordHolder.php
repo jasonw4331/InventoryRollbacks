@@ -150,7 +150,7 @@ final class InventoryRecordHolder{
 	/**
 	 * @return MultiInventoryCapture[]
 	 */
-	public static function extractCachedInventories(string $playerName) : array{
+	public static function extractInventoryCaptures(string $playerName) : array{
 		$inventories = [];
 		$playerInventories = self::$playerInventories[$playerName] ?? [];
 		$armorInventories = self::$armorInventories[$playerName] ?? [];
