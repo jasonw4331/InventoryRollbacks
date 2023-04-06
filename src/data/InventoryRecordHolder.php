@@ -13,8 +13,10 @@ use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
 use function array_keys;
+use function array_shift;
 use function array_unique;
 use function assert;
+use function count;
 use function time;
 use const SORT_NUMERIC;
 
@@ -22,12 +24,12 @@ final class InventoryRecordHolder{
 
 	private function __construct(){ } // NOOP
 
-	public CONST PLAYER_INVENTORY_SIZE = 36;
-	public CONST ARMOR_INVENTORY_SIZE = 4;
-	public CONST CURSOR_INVENTORY_SIZE = 1;
-	public CONST OFFHAND_INVENTORY_SIZE = 1;
+	public const PLAYER_INVENTORY_SIZE = 36;
+	public const ARMOR_INVENTORY_SIZE = 4;
+	public const CURSOR_INVENTORY_SIZE = 1;
+	public const OFFHAND_INVENTORY_SIZE = 1;
 
-	private CONST CAPTURE_CACHE_SIZE = 5;
+	private const CAPTURE_CACHE_SIZE = 5;
 
 	/** @var Item[][][] */
 	private static array $playerInventories = [], $armorInventories = [], $cursorInventories = [], $offHandInventories = [];
@@ -59,21 +61,21 @@ final class InventoryRecordHolder{
 			return $capture;
 		}
 
-		if($timestamp === time()) {
+		if($timestamp === time()){
 			$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
 			$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
 			$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
 			$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
 
 			$player = Server::getInstance()->getPlayerExact($playerName);
-			if($player !== null) {
+			if($player !== null){
 				$playerInventory->setContents($player->getInventory()->getContents(true));
 				$armorInventory->setContents($player->getArmorInventory()->getContents(true));
 				$cursorInventory->setContents($player->getCursorInventory()->getContents(true));
 				$offHandInventory->setContents($player->getOffHandInventory()->getContents(true));
 			}else{
 				$offlineData = Server::getInstance()->getOfflinePlayerData($playerName);
-				if($offlineData !== null) {
+				if($offlineData !== null){
 					$inventoryTag = $offlineData->getListTag('Inventory');
 					if($inventoryTag !== null){
 						$inventoryItems = [];
@@ -207,24 +209,24 @@ final class InventoryRecordHolder{
 	}
 
 	public static function clearCaches(string $playerName, ?int $afterTimestamp = null) : void{
-		if($afterTimestamp !== null) {
-			foreach (self::$playerInventories[$playerName] ?? [] as $timestamp => $inventory) {
-				if ($timestamp >= $afterTimestamp) {
+		if($afterTimestamp !== null){
+			foreach(self::$playerInventories[$playerName] ?? [] as $timestamp => $inventory){
+				if($timestamp >= $afterTimestamp){
 					unset(self::$playerInventories[$playerName][$timestamp]);
 				}
 			}
-			foreach (self::$armorInventories[$playerName] ?? [] as $timestamp => $inventory) {
-				if ($timestamp >= $afterTimestamp) {
+			foreach(self::$armorInventories[$playerName] ?? [] as $timestamp => $inventory){
+				if($timestamp >= $afterTimestamp){
 					unset(self::$armorInventories[$playerName][$timestamp]);
 				}
 			}
-			foreach (self::$cursorInventories[$playerName] ?? [] as $timestamp => $inventory) {
-				if ($timestamp >= $afterTimestamp) {
+			foreach(self::$cursorInventories[$playerName] ?? [] as $timestamp => $inventory){
+				if($timestamp >= $afterTimestamp){
 					unset(self::$cursorInventories[$playerName][$timestamp]);
 				}
 			}
-			foreach (self::$offHandInventories[$playerName] ?? [] as $timestamp => $inventory) {
-				if ($timestamp >= $afterTimestamp) {
+			foreach(self::$offHandInventories[$playerName] ?? [] as $timestamp => $inventory){
+				if($timestamp >= $afterTimestamp){
 					unset(self::$offHandInventories[$playerName][$timestamp]);
 				}
 			}
@@ -278,7 +280,7 @@ final class InventoryRecordHolder{
 	}
 
 	/**
-	 * @param MultiInventoryCapture[]  $cachedCaptures
+	 * @param MultiInventoryCapture[] $cachedCaptures
 	 */
 	private static function getCachedCaptureNearTime(array $cachedCaptures, int $timestamp) : ?MultiInventoryCapture{
 		if(isset($cachedCaptures[$timestamp])){

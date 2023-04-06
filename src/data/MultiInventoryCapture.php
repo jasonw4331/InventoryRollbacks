@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\data;
@@ -18,7 +19,8 @@ final class MultiInventoryCapture{
 		private SimpleInventory $armorInventory,
 		private SimpleInventory $cursorInventory,
 		private SimpleInventory $offHandInventory
-	){}
+	){
+	}
 
 	public function getInventory() : SimpleInventory{
 		return $this->inventory;
@@ -37,13 +39,13 @@ final class MultiInventoryCapture{
 	}
 
 	public function restore(IPlayer $player) : void{
-		if($player instanceof Player) {
+		if($player instanceof Player){
 			$player->getInventory()->setContents($this->inventory->getContents());
 			$player->getArmorInventory()->setContents($this->armorInventory->getContents());
 			$player->getCursorInventory()->setContents($this->cursorInventory->getContents());
 			$player->getOffHandInventory()->setContents($this->offHandInventory->getContents());
 		}
-		if($player instanceof OfflinePlayer) {
+		if($player instanceof OfflinePlayer){
 			// get namedtag from reflection class
 			$refClass = (new \ReflectionClass($player))->getProperty("namedtag");
 			$refClass->setAccessible(true);
@@ -77,6 +79,11 @@ final class MultiInventoryCapture{
 			// write to disk
 			Server::getInstance()->saveOfflinePlayerData($player->getName(), $nbt);
 		}
+	}
+
+	public function getCompoundTag() : CompoundTag{
+		$nbt = CompoundTag::create();
+
 	}
 
 }

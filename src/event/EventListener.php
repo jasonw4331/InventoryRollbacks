@@ -36,7 +36,7 @@ final class EventListener implements Listener{
 		}
 	}*/
 
-	public function onPlayerJoin(PlayerJoinEvent $event) : void {
+	public function onPlayerJoin(PlayerJoinEvent $event) : void{
 		$player = $event->getPlayer();
 		// on join load most recent inventory record from disk and compare it to the current inventory
 		// if the inventories are different, save the current inventory as a new record
@@ -61,12 +61,12 @@ final class EventListener implements Listener{
 				$inventory instanceof PlayerCursorInventory ||
 				$inventory instanceof ArmorInventory ||
 				$inventory instanceof PlayerOffHandInventory
-			) {
+			){
 				$clonedList[] = get_class($inventory);
 			}
 		}
 
-		$this->plugin->getScheduler()->scheduleTask(new ClosureTask(static function() use($player, $clonedList) {
+		$this->plugin->getScheduler()->scheduleTask(new ClosureTask(static function() use ($player, $clonedList){
 			$inventories = [];
 			foreach($clonedList as $class){
 				if($class === PlayerInventory::class){

@@ -188,7 +188,7 @@ final class Main extends PluginBase{
 			}
 		);
 
-		$menu->setInventoryCloseListener(static function(Player $viewer, Inventory $inventory) use($player) {
+		$menu->setInventoryCloseListener(static function(Player $viewer, Inventory $inventory) use ($player){
 			$viewer->sendMessage(
 				$viewer->getLanguage()->translate(
 					CustomKnownTranslationFactory::rollbackinventory_menu_confirmation($player->getName())
@@ -200,9 +200,9 @@ final class Main extends PluginBase{
 
 		/** @var RegisteredListener $listener */
 		$listener = null;
-		$listener = $this->getServer()->getPluginManager()->registerEvent(PlayerChatEvent::class, function(PlayerChatEvent $event) use ($viewer, $player, &$timestamp, &$listener) {
-			if($event->getPlayer() === $viewer) {
-				if(mb_strtolower($event->getMessage()) === 'y') {
+		$listener = $this->getServer()->getPluginManager()->registerEvent(PlayerChatEvent::class, function(PlayerChatEvent $event) use ($viewer, $player, &$timestamp, &$listener){
+			if($event->getPlayer() === $viewer){
+				if(mb_strtolower($event->getMessage()) === 'y'){
 					// handle rollback
 					InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)->restore($player);
 					// clear cache after timestamp
@@ -234,7 +234,7 @@ final class Main extends PluginBase{
 		// name armor slots if air
 		foreach($armorInventory as $slot => $item){
 			if($item->isNull()){
-				$armorInventory[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(match ($slot){
+				$armorInventory[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(match ($slot) {
 					0 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_helmet()),
 					1 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_chestplate()),
 					2 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_leggings()),

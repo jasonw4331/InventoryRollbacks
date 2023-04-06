@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\command\argument;
@@ -6,6 +7,7 @@ namespace jasonwynn10\InventoryRollbacks\command\argument;
 use CortexPE\Commando\args\BaseArgument;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use function preg_match;
 
 final class ISO8601Argument extends BaseArgument{
 

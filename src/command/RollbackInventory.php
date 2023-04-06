@@ -14,6 +14,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\lang\KnownTranslationFactory;
 use pocketmine\player\OfflinePlayer;
 use pocketmine\player\Player;
+use function time;
 
 final class RollbackInventory extends BaseCommand{
 
@@ -39,7 +40,7 @@ final class RollbackInventory extends BaseCommand{
 	 * @phpstan-param array{
 	 *   "player": OfflinePlayer|Player|null,
 	 *   "time": string|null
-	 * } $args
+	 * }                     $args
 	 */
 	public function onRun(CommandSender $sender, string $aliasUsed, array $args) : void{
 		if($args['player'] === null){
