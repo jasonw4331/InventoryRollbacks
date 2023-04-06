@@ -24,9 +24,11 @@ use pocketmine\item\StringToItemParser;
 use pocketmine\lang\Language;
 use pocketmine\network\mcpe\protocol\types\entity\EntityMetadataProperties;
 use pocketmine\network\mcpe\protocol\types\inventory\WindowTypes;
+use pocketmine\player\IPlayer;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\resourcepacks\ZippedResourcePack;
+use pocketmine\Server;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\TextFormat;
 use Symfony\Component\Filesystem\Path;
@@ -130,7 +132,7 @@ final class Main extends PluginBase{
 		// TODO: handle saving of incremental transaction data
 	}
 
-	public function showTransactionsMenu(Player $viewer, Player $player, int $timestamp) : void{
+	public function showTransactionsMenu(Player $viewer, IPlayer $player, int $timestamp) : void{
 		$lang = $viewer->getLanguage();
 
 		// identify padding item
@@ -196,8 +198,8 @@ final class Main extends PluginBase{
 	/**
 	 * @return Item[]
 	 */
-	private function compileMenuItems(Item $fillerItem, Item $nextPageItem, Item $previousPageItem, Player $player, int $timestamp, MultiInventoryCapture $capture) : array{
-		$lang = $player->getLanguage();
+	private function compileMenuItems(Item $fillerItem, Item $nextPageItem, Item $previousPageItem, IPlayer $player, int $timestamp, MultiInventoryCapture $capture) : array{
+		$lang = Server::getInstance()->getLanguage();
 
 		$armorInventory = $capture->getArmorInventory()->getContents(true);
 		$cursorItem = $capture->getCursorInventory()->getItem(0);
