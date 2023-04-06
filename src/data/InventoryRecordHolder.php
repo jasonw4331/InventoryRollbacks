@@ -168,7 +168,7 @@ final class InventoryRecordHolder{
 				return $t;
 			}
 		}
-		return time();
+		return -1;
 	}
 
 	public static function getPreviousTimestamp(string $playerName, int $timestamp) : int{

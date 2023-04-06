@@ -241,7 +241,7 @@ final class Main extends PluginBase{
 
 		// add page items to top row at indexes 3 and 10
 		$unorderedItemRows[4][3] = InventoryRecordHolder::getPreviousTimestamp($player->getName(), $timestamp) > -1 ? $previousPageItem : $fillerItem;
-		$unorderedItemRows[4][9] = InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp) !== time() ? $nextPageItem : $fillerItem;
+		$unorderedItemRows[4][9] = InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp) !== -1 ? $nextPageItem : $fillerItem;
 
 		// add armor at right-most side of 2nd row and below
 		$unorderedItemRows[1][12] = $armorInventory[0];
