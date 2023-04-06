@@ -1,32 +1,17 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Instanceof between pocketmine\\\\inventory\\\\PlayerOffHandInventory and pocketmine\\\\inventory\\\\PlayerOffHandInventory will always evaluate to true\\.$#"
+			message: "#^Anonymous function has invalid return type muqsit\\\\invmenu\\\\transaction\\\\InvMenuTransactionResult\\.$#"
 			count: 1
-			path: ../../src/InventoryRecordHolder.php
+			path: ../../src/Main.php
 
 		-
-			message: "#^Method jasonwynn10\\\\InventoryRollbacks\\\\InventoryRecordHolder\\:\\:getPreviousTimestamp\\(\\) should return int but returns int\\|string\\.$#"
+			message: "#^Call to method discard\\(\\) on an unknown class muqsit\\\\invmenu\\\\transaction\\\\InvMenuTransaction\\.$#"
 			count: 1
-			path: ../../src/InventoryRecordHolder.php
+			path: ../../src/Main.php
 
 		-
-			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\InventoryRecordHolder\\:\\:\\$armorInventories type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: ../../src/InventoryRecordHolder.php
-
-		-
-			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\InventoryRecordHolder\\:\\:\\$cursorInventories type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: ../../src/InventoryRecordHolder.php
-
-		-
-			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\InventoryRecordHolder\\:\\:\\$offHandInventories type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: ../../src/InventoryRecordHolder.php
-
-		-
-			message: "#^Call to method getItemClicked\\(\\) on an unknown class muqsit\\\\invmenu\\\\transaction\\\\DeterministicInvMenuTransaction\\.$#"
+			message: "#^Call to method getOut\\(\\) on an unknown class muqsit\\\\invmenu\\\\transaction\\\\InvMenuTransaction\\.$#"
 			count: 2
 			path: ../../src/Main.php
 
@@ -51,16 +36,6 @@ parameters:
 			path: ../../src/Main.php
 
 		-
-			message: "#^Call to static method isRegistered\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenuHandler\\.$#"
-			count: 1
-			path: ../../src/Main.php
-
-		-
-			message: "#^Call to static method readonly\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenu\\.$#"
-			count: 1
-			path: ../../src/Main.php
-
-		-
 			message: "#^Call to static method register\\(\\) on an unknown class muqsit\\\\invmenu\\\\InvMenuHandler\\.$#"
 			count: 1
 			path: ../../src/Main.php
@@ -81,32 +56,97 @@ parameters:
 			path: ../../src/Main.php
 
 		-
-			message: "#^Parameter \\$transaction of anonymous function has invalid type muqsit\\\\invmenu\\\\transaction\\\\DeterministicInvMenuTransaction\\.$#"
+			message: "#^Cannot call method setContents\\(\\) on pocketmine\\\\inventory\\\\Inventory\\|null\\.$#"
+			count: 2
+			path: ../../src/Main.php
+
+		-
+			message: "#^Parameter \\#1 \\$object of method pocketmine\\\\event\\\\HandlerList\\:\\:unregister\\(\\) expects pocketmine\\\\event\\\\Listener\\|pocketmine\\\\event\\\\RegisteredListener\\|pocketmine\\\\plugin\\\\Plugin, pocketmine\\\\event\\\\RegisteredListener\\|void given\\.$#"
 			count: 1
 			path: ../../src/Main.php
 
 		-
-			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\Main\\:\\:\\$languages type has no value type specified in iterable type array\\.$#"
+			message: "#^Parameter \\$transaction of anonymous function has invalid type muqsit\\\\invmenu\\\\transaction\\\\InvMenuTransaction\\.$#"
 			count: 1
 			path: ../../src/Main.php
 
 		-
-			message: "#^Undefined variable\\: \\$player$#"
+			message: "#^Result of method pocketmine\\\\plugin\\\\PluginManager\\:\\:registerEvent\\(\\) \\(void\\) is used\\.$#"
+			count: 1
+			path: ../../src/Main.php
+
+		-
+			message: "#^Offset 1 on array\\{player\\: pocketmine\\\\player\\\\OfflinePlayer\\|pocketmine\\\\player\\\\Player, time\\: string\\|null\\} in isset\\(\\) does not exist\\.$#"
+			count: 1
+			path: ../../src/command/RollbackInventory.php
+
+		-
+			message: "#^Parameter \\#1 \\$sender \\(pocketmine\\\\player\\\\Player\\) of method jasonwynn10\\\\InventoryRollbacks\\\\command\\\\RollbackInventory\\:\\:onRun\\(\\) should be contravariant with parameter \\$sender \\(pocketmine\\\\command\\\\CommandSender\\) of method CortexPE\\\\Commando\\\\BaseCommand\\:\\:onRun\\(\\)$#"
+			count: 1
+			path: ../../src/command/RollbackInventory.php
+
+		-
+			message: "#^Parameter \\#3 \\$args \\(array\\{player\\: pocketmine\\\\player\\\\OfflinePlayer\\|pocketmine\\\\player\\\\Player\\|null, time\\: string\\|null\\}\\) of method jasonwynn10\\\\InventoryRollbacks\\\\command\\\\RollbackInventory\\:\\:onRun\\(\\) should be contravariant with parameter \\$args \\(array\\) of method CortexPE\\\\Commando\\\\BaseCommand\\:\\:onRun\\(\\)$#"
+			count: 1
+			path: ../../src/command/RollbackInventory.php
+
+		-
+			message: "#^Instanceof between pocketmine\\\\inventory\\\\PlayerOffHandInventory and pocketmine\\\\inventory\\\\PlayerOffHandInventory will always evaluate to true\\.$#"
+			count: 1
+			path: ../../src/data/InventoryRecordHolder.php
+
+		-
+			message: "#^Method jasonwynn10\\\\InventoryRollbacks\\\\data\\\\InventoryRecordHolder\\:\\:getPreviousTimestamp\\(\\) should return int but returns int\\|string\\.$#"
+			count: 1
+			path: ../../src/data/InventoryRecordHolder.php
+
+		-
+			message: "#^Parameter \\#1 \\$tag of static method jasonwynn10\\\\InventoryRollbacks\\\\util\\\\CaptureConverter\\:\\:fromNBT\\(\\) expects pocketmine\\\\nbt\\\\tag\\\\CompoundTag, pocketmine\\\\nbt\\\\tag\\\\CompoundTag\\|null given\\.$#"
+			count: 1
+			path: ../../src/data/InventoryRecordHolder.php
+
+		-
+			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\data\\\\InventoryRecordHolder\\:\\:\\$armorInventories type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/data/InventoryRecordHolder.php
+
+		-
+			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\data\\\\InventoryRecordHolder\\:\\:\\$cursorInventories type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/data/InventoryRecordHolder.php
+
+		-
+			message: "#^Property jasonwynn10\\\\InventoryRollbacks\\\\data\\\\InventoryRecordHolder\\:\\:\\$offHandInventories type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: ../../src/data/InventoryRecordHolder.php
+
+		-
+			message: "#^Call to an undefined static method pocketmine\\\\errorhandler\\\\ErrorToExceptionHandler\\:\\:trapAndRemoveFalse\\(\\)\\.$#"
 			count: 1
 			path: ../../src/event/EventListener.php
 
 		-
-			message: "#^Call to an undefined static method jasonwynn10\\\\InventoryRollbacks\\\\InventoryRecordHolder\\:\\:writeInventoriesToDisk\\(\\)\\.$#"
+			message: "#^Call to an undefined static method pocketmine\\\\utils\\\\Filesystem\\:\\:fileGetContents\\(\\)\\.$#"
 			count: 1
-			path: ../../src/task/SaveTransactionsTask.php
+			path: ../../src/event/EventListener.php
 
 		-
-			message: "#^Constructor of class jasonwynn10\\\\InventoryRollbacks\\\\task\\\\SaveTransactionsTask has an unused parameter \\$player\\.$#"
+			message: "#^Call to an undefined static method pocketmine\\\\utils\\\\Filesystem\\:\\:safeFilePutContents\\(\\)\\.$#"
 			count: 1
-			path: ../../src/task/SaveTransactionsTask.php
+			path: ../../src/event/EventListener.php
 
 		-
-			message: "#^Constructor of class jasonwynn10\\\\InventoryRollbacks\\\\task\\\\SaveTransactionsTask has an unused parameter \\$plugin\\.$#"
+			message: "#^Call to an undefined static method pocketmine\\\\utils\\\\Utils\\:\\:assumeNotFalse\\(\\)\\.$#"
 			count: 1
-			path: ../../src/task/SaveTransactionsTask.php
+			path: ../../src/event/EventListener.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of function array_filter expects array, array\\<int, string\\>\\|false given\\.$#"
+			count: 1
+			path: ../../src/event/EventListener.php
+
+		-
+			message: "#^Access to undefined constant pocketmine\\\\item\\\\Item\\:\\:TAG_SLOT\\.$#"
+			count: 1
+			path: ../../src/util/CaptureConverter.php
 
