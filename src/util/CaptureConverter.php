@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\util;
@@ -13,7 +14,7 @@ use pocketmine\nbt\tag\ListTag;
 
 final class CaptureConverter{
 
-	public static function toNBT(MultiInventoryCapture $capture, bool $cursor = false) : CompoundTag {
+	public static function toNBT(MultiInventoryCapture $capture, bool $cursor = false) : CompoundTag{
 		$nbt = CompoundTag::create();
 		// set inventories
 		$inventoryTag = new ListTag([], NBT::TAG_Compound);
@@ -48,7 +49,7 @@ final class CaptureConverter{
 		return $nbt;
 	}
 
-	public static function fromNBT(CompoundTag $tag, bool $cursorTag = false) : MultiInventoryCapture {
+	public static function fromNBT(CompoundTag $tag, bool $cursorTag = false) : MultiInventoryCapture{
 		$playerInventory = new SimpleInventory(InventoryRecordHolder::PLAYER_INVENTORY_SIZE);
 		$armorInventory = new SimpleInventory(InventoryRecordHolder::ARMOR_INVENTORY_SIZE);
 		$cursorInventory = new SimpleInventory(InventoryRecordHolder::CURSOR_INVENTORY_SIZE);
@@ -89,7 +90,7 @@ final class CaptureConverter{
 	/**
 	 * @return SimpleInventory[]
 	 */
-	public static function toInventories(MultiInventoryCapture $capture) : array {
+	public static function toInventories(MultiInventoryCapture $capture) : array{
 		return [
 			"inventory" => $capture->getInventory(),
 			"armor" => $capture->getArmorInventory(),
