@@ -133,7 +133,6 @@ final class Main extends PluginBase{
 
 		unlink(Path::join($this->getDataFolder(), self::$pack->getPackName() . '.mcpack'));
 		$this->getLogger()->debug('Resource pack file deleted');
-		// TODO: handle saving of incremental transaction data
 	}
 
 	public function showTransactionsMenu(Player $viewer, IPlayer $player, int $timestamp) : void{
