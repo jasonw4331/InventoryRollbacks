@@ -48,7 +48,6 @@ use const FILTER_NULL_ON_FAILURE;
 final class Main extends PluginBase{
 
 	public const TYPE_ROLLBACKS_VIEW = 'inventoryrollbacks:rollbacks_view';
-	private static array $languages = [];
 	private static ?ZippedResourcePack $pack;
 
 	public function onEnable() : void{
@@ -80,6 +79,7 @@ final class Main extends PluginBase{
 			$languageAliases[$mini] = $language;
 		}
 
+		$languages = [];
 		$dir = scandir(Path::join($this->getDataFolder(), "lang", "data"));
 		if($dir !== false){
 			foreach($dir as $file){
@@ -93,32 +93,32 @@ final class Main extends PluginBase{
 					$languageName,
 					Path::join($this->getDataFolder(), "lang", "data")
 				);
-				self::$languages[$languageName] = $language;
-				foreach($languageAliases as $languageAlias => $alias){
-					if(mb_strtolower($alias) === $languageName){
-						self::$languages[mb_strtolower($languageAlias)] = $language;
-						unset($languageAliases[$languageAlias]);
+				$languages[$languageName] = $language;
+				foreach($languageAliases as $mini => $full){
+					if(mb_strtolower($full) === $languageName){
+						$languages[mb_strtolower($mini)] = $language;
+						unset($languageAliases[$mini]);
 					}
 				}
 			}
 		}
 
 		// add translations to existing server language instance
-		$languageA = $this->getServer()->getLanguage();
-		$refClass = new \ReflectionClass($languageA);
+		$serverLanguage = $this->getServer()->getLanguage();
+		$refClass = new \ReflectionClass($serverLanguage);
 		$refPropA = $refClass->getProperty('lang');
 		$refPropA->setAccessible(true);
-		/** @var string[] $langA */
-		$langA = $refPropA->getValue($languageA);
+		/** @var string[] $serverLanguageList */
+		$serverLanguageList = $refPropA->getValue($serverLanguage);
 
-		$languageB = self::$languages[$languageA->getLang()];
-		$refClass = new \ReflectionClass($languageB);
+		$pluginLanguage = $languages[$serverLanguage->getLang()];
+		$refClass = new \ReflectionClass($pluginLanguage);
 		$refPropB = $refClass->getProperty('lang');
 		$refPropB->setAccessible(true);
-		/** @var string[] $langB */
-		$langB = $refPropB->getValue($languageB);
+		/** @var string[] $pluginLanguageList */
+		$pluginLanguageList = $refPropB->getValue($pluginLanguage);
 
-		$refPropA->setValue($languageA, array_merge($langA, $langB));
+		$refPropA->setValue($serverLanguage, array_merge($serverLanguageList, $pluginLanguageList));
 	}
 
 	public function onDisable() : void{
