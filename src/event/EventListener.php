@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace jasonwynn10\InventoryRollbacks\event;
 
+use Exception;
 use jasonwynn10\InventoryRollbacks\data\InventoryRecordHolder;
 use jasonwynn10\InventoryRollbacks\Main;
+use jasonwynn10\InventoryRollbacks\util\CaptureConverter;
+use pocketmine\errorhandler\ErrorToExceptionHandler;
 use pocketmine\event\inventory\InventoryTransactionEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -45,10 +48,42 @@ final class EventListener implements Listener{
 	}*/
 
 	public function onPlayerJoin(PlayerJoinEvent $event) : void{
-		$player = $event->getPlayer();
-		// on join load most recent inventory record from disk and compare it to the current inventory
-		// if the inventories are different, save the current inventory as a new record
-		// if the inventories are the same, add to cache
+		$name = $event->getPlayer()->getName();
+		$path = Path::join($this->plugin->getDataFolder(), 'captures', $name . '.nbt');
+		//load all inventory records from disk
+		if(!file_exists($path)){
+			return;
+		}
+
+		try{
+			$contents = Filesystem::fileGetContents($path);
+		}catch(\RuntimeException $e){
+			throw new Exception("Failed to read player inventory capture file \"$path\": " . $e->getMessage(), 0, $e);
+		}
+
+		try{
+			$decompressed = ErrorToExceptionHandler::trapAndRemoveFalse(fn() => zlib_decode($contents));
+		}catch(\ErrorException $e){
+			// TODO: handle corrupt data
+			throw new Exception("Failed to decompress raw player inventory capture for \"$name\": " . $e->getMessage(), 0, $e);
+		}
+
+		/** @var ListTag $listTag */
+		$listTag = (new BigEndianNbtSerializer())->read($decompressed)->getTag();
+
+		// convert tags to Capture objects
+		$inventoryCaptures = [];
+		foreach($listTag as $tag){
+			$inventoryCaptures[$tag->getInt('timestamp')] = CaptureConverter::fromNBT($tag);
+		}
+		// find 5 most recent inventory captures by timestamp
+		krsort($inventoryCaptures, SORT_NUMERIC);
+		$inventoryCaptures = array_slice($inventoryCaptures, 0, 5, true);
+		// add to cache
+		foreach($inventoryCaptures as $timestamp => $inventoryCapture){
+			InventoryRecordHolder::importTimestampedIntoCache($name, $timestamp, $inventoryCapture);
+		}
+		// TODO: check for offline inventory edits
 	}
 
 	public function onTransaction(InventoryTransactionEvent $event) : void{
