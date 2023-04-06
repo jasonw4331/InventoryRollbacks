@@ -51,7 +51,7 @@ final class EventListener implements Listener{
 		$path = Path::join($this->plugin->getDataFolder(), 'captures', $name);
 		@mkdir($path, 0777, true);
 		//load all inventory records from disk
-		if(!file_exists($path)){
+		if(!is_dir($path)){
 			return;
 		}
 		// find 5 files with most recent timestamp
