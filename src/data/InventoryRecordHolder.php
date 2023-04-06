@@ -13,15 +13,21 @@ use pocketmine\item\Item;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\Server;
 use function array_keys;
+use function array_unique;
+use function assert;
 use function time;
+use const SORT_NUMERIC;
 
 final class InventoryRecordHolder{
+
 	private function __construct(){ } // NOOP
 
 	public CONST PLAYER_INVENTORY_SIZE = 36;
 	public CONST ARMOR_INVENTORY_SIZE = 4;
 	public CONST CURSOR_INVENTORY_SIZE = 1;
 	public CONST OFFHAND_INVENTORY_SIZE = 1;
+
+	private CONST CAPTURE_CACHE_SIZE = 5;
 
 	/** @var Item[][][] */
 	private static array $playerInventories = [], $armorInventories = [], $cursorInventories = [], $offHandInventories = [];
@@ -53,26 +59,18 @@ final class InventoryRecordHolder{
 			return $capture;
 		}
 
-		$playerInventory = null;
-		$armorInventory = null;
-		$cursorInventory = null;
-		$offHandInventory = null;
 		if($timestamp === time()) {
+			$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
+			$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
+			$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
+			$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
+
 			$player = Server::getInstance()->getPlayerExact($playerName);
 			if($player !== null) {
-				$playerInventoryItems = $player->getInventory()->getContents(true);
-				$armorInventoryItems = $player->getArmorInventory()->getContents(true);
-				$cursorInventoryItems = $player->getCursorInventory()->getContents(true);
-				$offHandInventoryItems = $player->getOffHandInventory()->getContents(true);
-
-				$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
-				$playerInventory->setContents($playerInventoryItems);
-				$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
-				$armorInventory->setContents($armorInventoryItems);
-				$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
-				$cursorInventory->setContents($cursorInventoryItems);
-				$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
-				$offHandInventory->setContents($offHandInventoryItems);
+				$playerInventory->setContents($player->getInventory()->getContents(true));
+				$armorInventory->setContents($player->getArmorInventory()->getContents(true));
+				$cursorInventory->setContents($player->getCursorInventory()->getContents(true));
+				$offHandInventory->setContents($player->getOffHandInventory()->getContents(true));
 			}else{
 				$offlineData = Server::getInstance()->getOfflinePlayerData($playerName);
 				if($offlineData !== null) {
@@ -88,17 +86,14 @@ final class InventoryRecordHolder{
 								//Old hotbar saving stuff, ignore it
 							}elseif($slot >= 100 && $slot < 104){ //Armor
 								$armorInventoryItems[$slot - 100] = Item::nbtDeserialize($item);
-							}elseif($slot >= 9 && $slot < 36 + 9){
+							}elseif($slot >= 9 && $slot < self::PLAYER_INVENTORY_SIZE + 9){
 								$inventoryItems[$slot - 9] = Item::nbtDeserialize($item);
 							}
 						}
-						$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
 						$playerInventory->setContents($inventoryItems);
-						$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
 						$armorInventory->setContents($armorInventoryItems);
 					}
 					$offHand = $offlineData->getCompoundTag('OffHandItem');
-					$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
 					if($offHand !== null){
 						$offHandInventory->setContents([Item::nbtDeserialize($offHand)]);
 					}
@@ -108,33 +103,48 @@ final class InventoryRecordHolder{
 			// get inventories that are closest to the given timestamp
 			// if there are no inventories of same type find next timestamp
 			// if there are no inventories of same type or next timestamp, return empty inventory
-			$playerInventories = self::$playerInventories[$playerName] ?? [];
-			$armorInventories = self::$armorInventories[$playerName] ?? [];
-			$cursorInventories = self::$cursorInventories[$playerName] ?? [];
-			$offHandInventories = self::$offHandInventories[$playerName] ?? [];
-
-			$playerInventory = self::getInventoryNearTime($timestamp, $playerInventories, self::PLAYER_INVENTORY_SIZE); // player inventory size
-			$armorInventory = self::getInventoryNearTime($timestamp, $armorInventories, self::ARMOR_INVENTORY_SIZE); // armor inventory size
-			$cursorInventory = self::getInventoryNearTime($timestamp, $cursorInventories, self::CURSOR_INVENTORY_SIZE); // cursor inventory size
-			$offHandInventory = self::getInventoryNearTime($timestamp, $offHandInventories, self::OFFHAND_INVENTORY_SIZE); // offhand inventory size
+			$playerInventory = self::getInventoryNearTime($timestamp, self::$playerInventories[$playerName] ?? [], self::PLAYER_INVENTORY_SIZE); // player inventory size
+			$armorInventory = self::getInventoryNearTime($timestamp, self::$armorInventories[$playerName] ?? [], self::ARMOR_INVENTORY_SIZE); // armor inventory size
+			$cursorInventory = self::getInventoryNearTime($timestamp, self::$cursorInventories[$playerName] ?? [], self::CURSOR_INVENTORY_SIZE); // cursor inventory size
+			$offHandInventory = self::getInventoryNearTime($timestamp, self::$offHandInventories[$playerName] ?? [], self::OFFHAND_INVENTORY_SIZE); // offhand inventory size
 		}
 
-		self::$captureCache[$playerName][$timestamp] = $capture = new MultiInventoryCapture(
+		self::pushCaptureToCache($playerName, $timestamp, $capture = new MultiInventoryCapture(
 			$playerInventory,
 			$armorInventory,
 			$cursorInventory,
 			$offHandInventory
-		);
+		));
 
 		return $capture;
 	}
 
 	public static function importTimestampedIntoCache(string $playerName, int $timestamp, MultiInventoryCapture $inventory) : void{
 		self::prepareLists($playerName);
-		self::$playerInventories[$playerName][$timestamp] = $inventory->getInventory()->getContents();
-		self::$armorInventories[$playerName][$timestamp] = $inventory->getArmorInventory()->getContents();
-		self::$cursorInventories[$playerName][$timestamp] = $inventory->getCursorInventory()->getContents();
-		self::$offHandInventories[$playerName][$timestamp] = $inventory->getOffHandInventory()->getContents();
+
+		$playerInventory = new SimpleInventory(self::PLAYER_INVENTORY_SIZE);
+		$playerInventory->setContents(
+			self::$playerInventories[$playerName][$timestamp] = $inventory->getInventory()->getContents(true)
+		);
+		$armorInventory = new SimpleInventory(self::ARMOR_INVENTORY_SIZE);
+		$armorInventory->setContents(
+			self::$armorInventories[$playerName][$timestamp] = $inventory->getArmorInventory()->getContents(true)
+		);
+		$cursorInventory = new SimpleInventory(self::CURSOR_INVENTORY_SIZE);
+		$cursorInventory->setContents(
+			self::$cursorInventories[$playerName][$timestamp] = $inventory->getCursorInventory()->getContents(true)
+		);
+		$offHandInventory = new SimpleInventory(self::OFFHAND_INVENTORY_SIZE);
+		$offHandInventory->setContents(
+			self::$offHandInventories[$playerName][$timestamp] = $inventory->getOffHandInventory()->getContents(true)
+		);
+
+		self::pushCaptureToCache($playerName, $timestamp, new MultiInventoryCapture(
+			$playerInventory,
+			$armorInventory,
+			$cursorInventory,
+			$offHandInventory
+		));
 	}
 
 	/**
@@ -149,12 +159,7 @@ final class InventoryRecordHolder{
 
 		$timestamps = array_unique(array_keys($playerInventories) + array_keys($armorInventories) + array_keys($cursorInventories) + array_keys($offHandInventories), SORT_NUMERIC);
 		foreach($timestamps as $timestamp){
-			$playerInventory = self::getInventoryNearTime($timestamp, $playerInventories, self::PLAYER_INVENTORY_SIZE); // player inventory size
-			$armorInventory = self::getInventoryNearTime($timestamp, $armorInventories, self::ARMOR_INVENTORY_SIZE); // armor inventory size
-			$cursorInventory = self::getInventoryNearTime($timestamp, $cursorInventories, self::CURSOR_INVENTORY_SIZE); // cursor inventory size
-			$offHandInventory = self::getInventoryNearTime($timestamp, $offHandInventories, self::OFFHAND_INVENTORY_SIZE); // offhand inventory size
-
-			$inventories[$timestamp] = new MultiInventoryCapture($playerInventory, $armorInventory, $cursorInventory, $offHandInventory);
+			$inventories[$timestamp] = self::getInventoriesNearTime($playerName, $timestamp);
 		}
 
 		return $inventories;
@@ -224,6 +229,16 @@ final class InventoryRecordHolder{
 		}
 		$inventory->setContents($itemArray[$closestTimestamp]);
 		return $inventory;
+	}
+
+	private static function pushCaptureToCache(string $playerName, int $timestamp, MultiInventoryCapture $capture) : void{
+		if(!isset(self::$captureCache[$playerName])){
+			self::$captureCache[$playerName] = [];
+		}
+		if(count(self::$captureCache[$playerName]) >= self::CAPTURE_CACHE_SIZE){
+			array_shift(self::$captureCache[$playerName]);
+		}
+		self::$captureCache[$playerName][$timestamp] = $capture;
 	}
 
 	/**
