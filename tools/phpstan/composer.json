@@ -5,15 +5,15 @@
 			"type": "package",
 			"package": {
 				"name": "muqsit/invmenu",
-				"version": "5.0.0",
+				"version": "4.5.0",
 				"source": {
 					"url": "https://github.com/Muqsit/InvMenu.git",
 					"type": "git",
 					"reference": "master"
 				},
 				"autoload": {
-					"psr-4": {
-						"muqsit\\invmenu\\": "src/"
+					"psr-0": {
+						"muqsit\\invmenu\\": "src/muqsit/invmenu/"
 					}
 				}
 			}
@@ -29,8 +29,8 @@
 					"reference": "master"
 				},
 				"autoload": {
-					"psr-4": {
-						"jasonwynn10\\libcustompack\\": "src/"
+					"psr-0": {
+						"libcustompack\\": "src/libCustomPack/"
 					}
 				}
 			}
@@ -43,7 +43,8 @@
 		"phpstan/extension-installer": "^1.0",
 		"symfony/filesystem": "^5.4",
 		"muqsit/invmenu": "*",
-		"jasonwynn10/libcustompack": "*"
+		"jasonwynn10/libcustompack": "*",
+		"cortexpe/commando": "dev-master"
 	},
 	"autoload": {
 		"psr-4": {
