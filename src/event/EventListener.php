@@ -18,8 +18,7 @@ use pocketmine\inventory\PlayerCursorInventory;
 use pocketmine\inventory\PlayerInventory;
 use pocketmine\inventory\PlayerOffHandInventory;
 use pocketmine\nbt\BigEndianNbtSerializer;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\ListTag;
+use pocketmine\nbt\NbtDataException;
 use pocketmine\nbt\TreeRoot;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\utils\Filesystem;
@@ -49,39 +48,45 @@ final class EventListener implements Listener{
 
 	public function onPlayerJoin(PlayerJoinEvent $event) : void{
 		$name = $event->getPlayer()->getName();
-		$path = Path::join($this->plugin->getDataFolder(), 'captures', $name . '.nbt');
+		$path = Path::join($this->plugin->getDataFolder(), 'captures', $name);
 		//load all inventory records from disk
 		if(!file_exists($path)){
 			return;
 		}
+		// find 5 files with most recent timestamp
+		$files = scandir($path);
+		$files = array_filter($files, static function(string $file) : bool{
+			return $file !== '.' and $file !== '..';
+		});
+		$files = array_map(static function(string $file) : int{
+			return (int) $file;
+		}, $files);
+		rsort($files);
+		$files = array_slice($files, 0, 5);
+		// load records from files
+		foreach($files as $file){
+			try{
+				$contents = Filesystem::fileGetContents($file);
+			}catch(\RuntimeException $e){
+				throw new Exception("Failed to read player inventory capture file \"$path\": " . $e->getMessage(), 0, $e);
+			}
 
-		try{
-			$contents = Filesystem::fileGetContents($path);
-		}catch(\RuntimeException $e){
-			throw new Exception("Failed to read player inventory capture file \"$path\": " . $e->getMessage(), 0, $e);
-		}
+			try{
+				$decompressed = ErrorToExceptionHandler::trapAndRemoveFalse(fn() => zlib_decode($contents));
+			}catch(\ErrorException $e){
+				rename($path, $path . '.bak');
+				throw new Exception("Failed to decompress raw player inventory capture for \"$name\": " . $e->getMessage(), 0, $e);
+			}
 
-		try{
-			$decompressed = ErrorToExceptionHandler::trapAndRemoveFalse(fn() => zlib_decode($contents));
-		}catch(\ErrorException $e){
-			// TODO: handle corrupt data
-			throw new Exception("Failed to decompress raw player inventory capture for \"$name\": " . $e->getMessage(), 0, $e);
-		}
+			try{
+				$tag = (new BigEndianNbtSerializer())->read($decompressed)->mustGetCompoundTag();
+			}catch(NbtDataException $e){ //corrupt data
+				rename($path, $path . '.bak');
+				throw new Exception("Failed to decode NBT inventory capture for \"$name\": " . $e->getMessage(), 0, $e);
+			}
 
-		/** @var ListTag $listTag */
-		$listTag = (new BigEndianNbtSerializer())->read($decompressed)->getTag();
-
-		// convert tags to Capture objects
-		$inventoryCaptures = [];
-		foreach($listTag as $tag){
-			$inventoryCaptures[$tag->getInt('timestamp')] = CaptureConverter::fromNBT($tag);
-		}
-		// find 5 most recent inventory captures by timestamp
-		krsort($inventoryCaptures, SORT_NUMERIC);
-		$inventoryCaptures = array_slice($inventoryCaptures, 0, 5, true);
-		// add to cache
-		foreach($inventoryCaptures as $timestamp => $inventoryCapture){
-			InventoryRecordHolder::importTimestampedIntoCache($name, $timestamp, $inventoryCapture);
+			// convert and cache capture object
+			InventoryRecordHolder::importTimestampedIntoCache($name, $tag->getInt('timestamp'), CaptureConverter::fromNBT($tag, true));
 		}
 		// TODO: check for offline inventory edits
 	}
@@ -132,21 +137,19 @@ final class EventListener implements Listener{
 		// clear cached inventory captures from memory
 		InventoryRecordHolder::clearCaches($event->getPlayer()->getName());
 		// convert inventory captures to compound tag
-		$captures = [];
 		foreach($inventoryCaptures as $timestamp => $inventoryCapture){
 			$tag = CaptureConverter::toNBT($inventoryCapture, true);
 			$tag->setInt('timestamp', $timestamp);
-			$captures[] = $tag;
-		}
-		// write tag to NBT file
-		$contents = Utils::assumeNotFalse(zlib_encode(
-			(new BigEndianNbtSerializer())->write(new TreeRoot(new ListTag($captures, NBT::TAG_Compound))),
-			ZLIB_ENCODING_GZIP
-		), "zlib_encode() failed unexpectedly");
-		try{
-			Filesystem::safeFilePutContents(Path::join($this->plugin->getDataFolder(), 'captures', $event->getPlayer()->getName() . '.nbt'), $contents);
-		}catch(\RuntimeException $e){
-			// TODO
+			// write tag to NBT file
+			$contents = Utils::assumeNotFalse(zlib_encode(
+				(new BigEndianNbtSerializer())->write(new TreeRoot($tag)),
+				ZLIB_ENCODING_GZIP
+			), "zlib_encode() failed unexpectedly");
+			try{
+				Filesystem::safeFilePutContents(Path::join($this->plugin->getDataFolder(), 'captures', $event->getPlayer()->getName(), $timestamp.'.nbt'), $contents);
+			}catch(\RuntimeException $e){
+				// TODO
+			}
 		}
 	}
 }
