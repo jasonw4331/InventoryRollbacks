@@ -206,6 +206,14 @@ final class InventoryRecordHolder{
 		}
 	}
 
+	public static function clearCaches(string $playerName) : void{
+		unset(self::$playerInventories[$playerName]);
+		unset(self::$armorInventories[$playerName]);
+		unset(self::$cursorInventories[$playerName]);
+		unset(self::$offHandInventories[$playerName]);
+		unset(self::$captureCache[$playerName]);
+	}
+
 	/**
 	 * @param Item[][] $itemArray
 	 */
