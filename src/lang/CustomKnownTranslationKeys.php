@@ -14,15 +14,13 @@ final class CustomKnownTranslationKeys{
 	public const COMMAND_ROLLBACKINVENTORY_DESCRIPTION = "command.rollbackinventory.description";
 	public const COMMAND_ROLLBACKINVENTORY_ERROR = "command.rollbackinventory.error";
 	public const COMMAND_ROLLBACKINVENTORY_SUCCESS = "command.rollbackinventory.success";
-	public const COMMAND_ROLLBACKINVENTORY_USAGE = "command.rollbackinventory.usage";
-	public const MENU_ARMORINVENTORY = "menu.armorinventory";
-	public const MENU_BOOTS = "menu.boots";
-	public const MENU_CHESTPLATE = "menu.chestplate";
-	public const MENU_CONFIRMATION = "menu.confirmation";
-	public const MENU_CURSORSLOT = "menu.cursorslot";
-	public const MENU_HELMET = "menu.helmet";
-	public const MENU_LEGGINGS = "menu.leggings";
-	public const MENU_NEXTPAGE = "menu.nextpage";
-	public const MENU_OFFHANDSLOT = "menu.offhandslot";
-	public const MENU_PREVIOUSPAGE = "menu.previouspage";
+	public const ROLLBACKINVENTORY_MENU_BOOTS = "rollbackinventory.menu.boots";
+	public const ROLLBACKINVENTORY_MENU_CHESTPLATE = "rollbackinventory.menu.chestplate";
+	public const ROLLBACKINVENTORY_MENU_CONFIRMATION = "rollbackinventory.menu.confirmation";
+	public const ROLLBACKINVENTORY_MENU_CURSORSLOT = "rollbackinventory.menu.cursorslot";
+	public const ROLLBACKINVENTORY_MENU_HELMET = "rollbackinventory.menu.helmet";
+	public const ROLLBACKINVENTORY_MENU_LEGGINGS = "rollbackinventory.menu.leggings";
+	public const ROLLBACKINVENTORY_MENU_NEXTPAGE = "rollbackinventory.menu.nextpage";
+	public const ROLLBACKINVENTORY_MENU_OFFHANDSLOT = "rollbackinventory.menu.offhandslot";
+	public const ROLLBACKINVENTORY_MENU_PREVIOUSPAGE = "rollbackinventory.menu.previouspage";
 }

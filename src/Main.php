@@ -143,11 +143,11 @@ final class Main extends PluginBase{
 		$itemString = filter_var($this->getConfig()->get('Next Page Item', 'lime_concrete'), options: FILTER_NULL_ON_FAILURE);
 		$item = $itemString === null ? VanillaBlocks::CONCRETE()->setColor(DyeColor::LIME())->asItem() :
 			(StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString));
-		$nextPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::menu_nextpage()));
+		$nextPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_nextpage()));
 		$itemString = filter_var($this->getConfig()->get('Previous Page Item', 'red_concrete'), options: FILTER_NULL_ON_FAILURE);
 		$item = $itemString === null ? VanillaBlocks::CONCRETE()->setColor(DyeColor::RED())->asItem() :
 			(StringToItemParser::getInstance()->parse($itemString) ?? LegacyStringToItemParser::getInstance()->parse($itemString));
-		$previousPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::menu_previouspage()));
+		$previousPageItem = $item->setCustomName($lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_previouspage()));
 
 		// create menu
 		$menu = InvMenu::create(self::TYPE_ROLLBACKS_VIEW);
@@ -182,7 +182,10 @@ final class Main extends PluginBase{
 			}
 		);
 
-		$menu->setInventoryCloseListener(static fn(Player $player, Inventory $inventory) => $player->sendMessage(CustomKnownTranslationFactory::menu_confirmation($player->getDisplayName())));
+		$menu->setInventoryCloseListener(
+			static fn(Player $player, Inventory $inventory) =>
+				$player->sendMessage(CustomKnownTranslationFactory::rollbackinventory_menu_confirmation($player->getDisplayName()))
+		);
 
 		$menu->send($viewer);
 	}
@@ -207,10 +210,10 @@ final class Main extends PluginBase{
 		foreach($armorInventory as $slot => $item){
 			if($item->isNull()){
 				$armorInventory[$slot] = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(match ($slot){
-					0 => $lang->translate(CustomKnownTranslationFactory::menu_helmet()),
-					1 => $lang->translate(CustomKnownTranslationFactory::menu_chestplate()),
-					2 => $lang->translate(CustomKnownTranslationFactory::menu_leggings()),
-					3 => $lang->translate(CustomKnownTranslationFactory::menu_boots()),
+					0 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_helmet()),
+					1 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_chestplate()),
+					2 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_leggings()),
+					3 => $lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_boots()),
 					default => throw new AssumptionFailedError('Invalid armor slot: ' . $slot)
 				});
 			}
@@ -219,14 +222,14 @@ final class Main extends PluginBase{
 		// name cursor slot if air
 		if($cursorItem->isNull()){
 			$cursorItem = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(
-				$lang->translate(CustomKnownTranslationFactory::menu_cursorslot())
+				$lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_cursorslot())
 			);
 		}
 
 		// name offhand slot if air
 		if($offHandItem->isNull()){
 			$offHandItem = VanillaBlocks::INVISIBLE_BEDROCK()->asItem()->setCustomName(
-				$lang->translate(CustomKnownTranslationFactory::menu_offhandslot())
+				$lang->translate(CustomKnownTranslationFactory::rollbackinventory_menu_offhandslot())
 			);
 		}
 

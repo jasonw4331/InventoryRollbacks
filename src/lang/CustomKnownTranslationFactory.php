@@ -28,52 +28,42 @@ final class CustomKnownTranslationFactory{
 		]);
 	}
 
-	public static function command_rollbackinventory_usage() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::COMMAND_ROLLBACKINVENTORY_USAGE, []);
+	public static function rollbackinventory_menu_boots() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_BOOTS, []);
 	}
 
-	public static function menu_armorinventory(Translatable|string $param0) : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_ARMORINVENTORY, [
+	public static function rollbackinventory_menu_chestplate() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_CHESTPLATE, []);
+	}
+
+	public static function rollbackinventory_menu_confirmation(Translatable|string $param0) : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_CONFIRMATION, [
 			0 => $param0,
 		]);
 	}
 
-	public static function menu_boots() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_BOOTS, []);
+	public static function rollbackinventory_menu_cursorslot() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_CURSORSLOT, []);
 	}
 
-	public static function menu_chestplate() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_CHESTPLATE, []);
+	public static function rollbackinventory_menu_helmet() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_HELMET, []);
 	}
 
-	public static function menu_confirmation(Translatable|string $param0) : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_CONFIRMATION, [
-			0 => $param0,
-		]);
+	public static function rollbackinventory_menu_leggings() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_LEGGINGS, []);
 	}
 
-	public static function menu_cursorslot() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_CURSORSLOT, []);
+	public static function rollbackinventory_menu_nextpage() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_NEXTPAGE, []);
 	}
 
-	public static function menu_helmet() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_HELMET, []);
+	public static function rollbackinventory_menu_offhandslot() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_OFFHANDSLOT, []);
 	}
 
-	public static function menu_leggings() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_LEGGINGS, []);
-	}
-
-	public static function menu_nextpage() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_NEXTPAGE, []);
-	}
-
-	public static function menu_offhandslot() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_OFFHANDSLOT, []);
-	}
-
-	public static function menu_previouspage() : Translatable{
-		return new Translatable(CustomKnownTranslationKeys::MENU_PREVIOUSPAGE, []);
+	public static function rollbackinventory_menu_previouspage() : Translatable{
+		return new Translatable(CustomKnownTranslationKeys::ROLLBACKINVENTORY_MENU_PREVIOUSPAGE, []);
 	}
 
 }
