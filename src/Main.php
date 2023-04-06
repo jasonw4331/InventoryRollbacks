@@ -184,7 +184,11 @@ final class Main extends PluginBase{
 
 		$menu->setInventoryCloseListener(
 			static fn(Player $player, Inventory $inventory) =>
-				$player->sendMessage(CustomKnownTranslationFactory::rollbackinventory_menu_confirmation($player->getDisplayName()))
+				$player->sendMessage(
+					$player->getLanguage()->translate(
+						CustomKnownTranslationFactory::rollbackinventory_menu_confirmation($player->getDisplayName())
+					)
+				)
 		);
 
 		$menu->send($viewer);
