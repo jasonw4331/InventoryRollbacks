@@ -1,6 +1,6 @@
 {
 	"name": "jasonw4331/inventoryrollbacks",
-	"description": "A PocketMine plugin to record all inventory transactions and enables roll backs at any time",
+	"description": "A PocketMine plugin which adds commands to the client's autofill system by parsing usage messages",
 	"type": "library",
 	"license": "lgpl-3.0-or-later",
 	"authors": [{
