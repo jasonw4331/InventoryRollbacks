@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks\command\argument;
+namespace jasonw4331\InventoryRollbacks\command\argument;
 
 use CortexPE\Commando\args\BaseArgument;
 use pocketmine\command\CommandSender;

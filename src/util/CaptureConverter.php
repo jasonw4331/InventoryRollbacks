@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks\util;
+namespace jasonw4331\InventoryRollbacks\util;
 
-use jasonwynn10\InventoryRollbacks\data\InventoryRecordHolder;
-use jasonwynn10\InventoryRollbacks\data\MultiInventoryCapture;
+use jasonw4331\InventoryRollbacks\data\InventoryRecordHolder;
+use jasonw4331\InventoryRollbacks\data\MultiInventoryCapture;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\item\Item;
 use pocketmine\nbt\NBT;

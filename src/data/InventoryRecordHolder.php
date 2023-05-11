@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks\data;
+namespace jasonw4331\InventoryRollbacks\data;
 
-use jasonwynn10\InventoryRollbacks\util\CaptureConverter;
+use jasonw4331\InventoryRollbacks\util\CaptureConverter;
 use pocketmine\inventory\ArmorInventory;
 use pocketmine\inventory\PlayerCursorInventory;
 use pocketmine\inventory\PlayerInventory;

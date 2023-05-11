@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks\data;
+namespace jasonw4331\InventoryRollbacks\data;
 
-use jasonwynn10\InventoryRollbacks\util\CaptureConverter;
+use jasonw4331\InventoryRollbacks\util\CaptureConverter;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\player\IPlayer;

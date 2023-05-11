@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks;
+namespace jasonw4331\InventoryRollbacks;
 
 use CortexPE\Commando\PacketHooker;
-use jasonwynn10\InventoryRollbacks\data\InventoryRecordHolder;
-use jasonwynn10\InventoryRollbacks\data\MultiInventoryCapture;
-use jasonwynn10\InventoryRollbacks\event\EventListener;
-use jasonwynn10\InventoryRollbacks\lang\CustomKnownTranslationFactory;
+use jasonw4331\InventoryRollbacks\data\InventoryRecordHolder;
+use jasonw4331\InventoryRollbacks\data\MultiInventoryCapture;
+use jasonw4331\InventoryRollbacks\event\EventListener;
+use jasonw4331\InventoryRollbacks\lang\CustomKnownTranslationFactory;
 use libCustomPack\libCustomPack;
 use muqsit\invmenu\InvMenu;
 use muqsit\invmenu\InvMenuHandler;

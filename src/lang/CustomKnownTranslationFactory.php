@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace jasonwynn10\InventoryRollbacks\lang;
+namespace jasonw4331\InventoryRollbacks\lang;
 
 use pocketmine\lang\Translatable;
 
