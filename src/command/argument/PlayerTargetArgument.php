@@ -7,6 +7,7 @@ namespace jasonw4331\InventoryRollbacks\command\argument;
 use CortexPE\Commando\args\BaseArgument;
 use pocketmine\command\CommandSender;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
+use pocketmine\player\OfflinePlayer;
 use pocketmine\player\Player;
 use pocketmine\Server;
 
@@ -21,7 +22,7 @@ final class PlayerTargetArgument extends BaseArgument{
 		return Player::isValidUserName($testString);
 	}
 
-	public function parse(string $argument, CommandSender $sender) : mixed{
+	public function parse(string $argument, CommandSender $sender) : Player|OfflinePlayer|null{
 		return Server::getInstance()->getOfflinePlayer($argument);
 	}
 

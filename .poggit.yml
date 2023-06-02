@@ -1,23 +1,23 @@
---- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonwynn10/InventoryRollbacks
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/jasonw4331/InventoryRollbacks
 build-by-default: true
 projects:
   InventoryRollbacks:
     path: ""
     icon: "icon.png"
-    lint: false
     excludeDirs:
-      - tests
       - .github
       - build
-      - phpstan
     excludeFiles:
       - .gitignore
       - CONTRIBUTING.md
       - SECURITY.md
+      - phpstan.neon.dist
+      - phpstan-baseline.php
+      - .php-cs-fixer.php
     libs:
       - src: muqsit/invmenu/InvMenu
-        version: ^4.5.0
-      - src: jasonwynn10/libCustomPack/libCustomPack
+        version: ^4.6.0
+      - src: jasonw4331/libCustomPack/libCustomPack
         version: ^0.1.1
       - src: CortexPE/Commando/Commando
         version: ^3.0.0

@@ -64,7 +64,8 @@ final class EventListener implements Listener{
 			return;
 		}
 		// find 5 files with most recent timestamp
-		$files = scandir($path);
+		/** @phpstan-var list<string> $files */
+		$files = ErrorToExceptionHandler::trapAndRemoveFalse(static fn() => scandir($path));
 		$files = array_filter($files, static fn(string $file) => $file !== '.' && $file !== '..');
 		rsort($files, SORT_NATURAL);
 		$files = array_slice($files, 0, 5);
@@ -77,7 +78,8 @@ final class EventListener implements Listener{
 			}
 
 			try{
-				$decompressed = ErrorToExceptionHandler::trapAndRemoveFalse(fn() => zlib_decode($contents));
+				/** @phpstan-var string $decompressed */
+				$decompressed = ErrorToExceptionHandler::trapAndRemoveFalse(static fn() => zlib_decode($contents));
 			}catch(\ErrorException $e){
 				rename($path, $path . '.bak');
 				throw new Exception("Failed to decompress raw player inventory capture for \"$name\": " . $e->getMessage(), 0, $e);

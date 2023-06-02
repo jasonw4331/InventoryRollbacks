@@ -35,6 +35,8 @@ use pocketmine\resourcepacks\ZippedResourcePack;
 use pocketmine\Server;
 use pocketmine\utils\AssumptionFailedError;
 use pocketmine\utils\TextFormat;
+use pocketmine\utils\Utils;
+use ReflectionClass;
 use Symfony\Component\Filesystem\Path;
 use function array_fill;
 use function array_map;
@@ -61,7 +63,7 @@ final class Main extends PluginBase{
 		PacketHooker::register($this);
 
 		// register custom inventory menu compatible with increased inventory size
-		$menuType = InvMenuTypeBuilders::ACTOR_FIXED()->setNetworkWindowType(WindowTypes::CONTAINER)->setSize(6 * 13); // 6 rows of 13 slots meant to hold the inventory of a player inventory with 2 slots padding top 3 sides
+		$menuType = InvMenuTypeBuilders::ACTOR_FIXED()->setNetworkWindowType(WindowTypes::CONTAINER)->setSize(6 * 13); // 6 rows of 13 slots meant to hold the inventory of a player inventory with 2 slots padding at top 3 sides
 		$menuType->getActorMetadata()->setString(EntityMetadataProperties::NAMETAG, str_repeat(TextFormat::RESET, 10));
 		InvMenuHandler::getTypeRegistry()->register(self::TYPE_ROLLBACKS_VIEW, $menuType->build());
 
@@ -100,31 +102,24 @@ final class Main extends PluginBase{
 					Path::join($this->getDataFolder(), "lang", "data")
 				);
 				$languages[$languageName] = $language;
-				foreach($languageAliases as $mini => $full){
-					if(mb_strtolower($full) === $languageName){
-						$languages[mb_strtolower($mini)] = $language;
-						unset($languageAliases[$mini]);
+				foreach(Utils::stringifyKeys($languageAliases) as $languageAlias => $alias){
+					if(mb_strtolower($alias) === $languageName){
+						$languages[mb_strtolower($languageAlias)] = $language;
+						unset($languageAliases[$languageAlias]);
 					}
 				}
 			}
 		}
 
 		// add translations to existing server language instance
-		$serverLanguage = $this->getServer()->getLanguage();
-		$refClass = new \ReflectionClass($serverLanguage);
+		$languageA = $this->getServer()->getLanguage();
+		$refClass = new ReflectionClass($languageA::class);
 		$refPropA = $refClass->getProperty('lang');
-		$refPropA->setAccessible(true);
-		/** @var string[] $serverLanguageList */
-		$serverLanguageList = $refPropA->getValue($serverLanguage);
-
-		$pluginLanguage = $languages[$serverLanguage->getLang()];
-		$refClass = new \ReflectionClass($pluginLanguage);
-		$refPropB = $refClass->getProperty('lang');
-		$refPropB->setAccessible(true);
-		/** @var string[] $pluginLanguageList */
-		$pluginLanguageList = $refPropB->getValue($pluginLanguage);
-
-		$refPropA->setValue($serverLanguage, array_merge($serverLanguageList, $pluginLanguageList));
+		/** @var string[] $langA */
+		$langA = $refPropA->getValue($languageA);
+		/** @var string[] $langB */
+		$langB = $refClass->getProperty('lang')->getValue($languages[$languageA->getLang()]);
+		$refPropA->setValue($languageA, array_merge($langA, $langB));
 	}
 
 	public function onDisable() : void{
@@ -169,7 +164,7 @@ final class Main extends PluginBase{
 				if($transaction->getOut()->equals($previousPageItem, true, false)){
 					$result->then(function(Player $viewer) use ($fillerItem, $nextPageItem, $previousPageItem, $player, &$timestamp) : void{
 						$timestamp = InventoryRecordHolder::getPreviousTimestamp($player->getName(), $timestamp);
-						$viewer->getCurrentWindow()->setContents($this->compileMenuItems(
+						$viewer->getCurrentWindow()?->setContents($this->compileMenuItems(
 							$fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp,
 							InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)
 						));
@@ -177,7 +172,7 @@ final class Main extends PluginBase{
 				}elseif($transaction->getOut()->equals($nextPageItem, true, false)){
 					$result->then(function(Player $viewer) use ($fillerItem, $nextPageItem, $previousPageItem, $player, &$timestamp) : void{
 						$timestamp = InventoryRecordHolder::getNextTimestamp($player->getName(), $timestamp);
-						$viewer->getCurrentWindow()->setContents($this->compileMenuItems(
+						$viewer->getCurrentWindow()?->setContents($this->compileMenuItems(
 							$fillerItem, $nextPageItem, $previousPageItem, $player, $timestamp,
 							InventoryRecordHolder::getInventoriesNearTime($player->getName(), $timestamp)
 						));

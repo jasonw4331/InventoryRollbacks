@@ -6,6 +6,7 @@ namespace jasonw4331\InventoryRollbacks\util;
 
 use jasonw4331\InventoryRollbacks\data\InventoryRecordHolder;
 use jasonw4331\InventoryRollbacks\data\MultiInventoryCapture;
+use pocketmine\data\bedrock\item\SavedItemStackData;
 use pocketmine\inventory\SimpleInventory;
 use pocketmine\item\Item;
 use pocketmine\nbt\NBT;
@@ -62,7 +63,7 @@ final class CaptureConverter{
 
 			/** @var CompoundTag $item */
 			foreach($inventoryTag as $item){
-				$slot = $item->getByte(Item::TAG_SLOT);
+				$slot = $item->getByte(SavedItemStackData::TAG_SLOT);
 				if($slot >= 0 && $slot < 9){ //Hotbar
 					//Old hotbar saving stuff, ignore it
 				}elseif($slot >= 100 && $slot < 104){ //Armor

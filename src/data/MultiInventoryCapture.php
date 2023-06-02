@@ -11,13 +11,14 @@ use pocketmine\player\IPlayer;
 use pocketmine\player\OfflinePlayer;
 use pocketmine\player\Player;
 use pocketmine\Server;
+use ReflectionClass;
 
 final class MultiInventoryCapture{
 	public function __construct(
-		private SimpleInventory $inventory,
-		private SimpleInventory $armorInventory,
-		private SimpleInventory $cursorInventory,
-		private SimpleInventory $offHandInventory
+		private readonly SimpleInventory $inventory,
+		private readonly SimpleInventory $armorInventory,
+		private readonly SimpleInventory $cursorInventory,
+		private readonly SimpleInventory $offHandInventory
 	){
 	}
 
@@ -46,10 +47,8 @@ final class MultiInventoryCapture{
 		}
 		if($player instanceof OfflinePlayer){
 			// get namedtag from reflection class
-			$refClass = (new \ReflectionClass($player))->getProperty("namedtag");
-			$refClass->setAccessible(true);
 			/** @var CompoundTag $nbt */
-			$nbt = $refClass->getValue($player);
+			$nbt = (new ReflectionClass($player))->getProperty("namedtag")->getValue($player);
 			$nbt->merge(CaptureConverter::toNBT($this));
 			// write to disk
 			Server::getInstance()->saveOfflinePlayerData($player->getName(), $nbt);

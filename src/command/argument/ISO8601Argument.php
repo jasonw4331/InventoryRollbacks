@@ -20,7 +20,7 @@ final class ISO8601Argument extends BaseArgument{
 		return preg_match('/^P(?!$)(\d+(?:\.\d+)?Y)?(\d+(?:\.\d+)?M)?(\d+(?:\.\d+)?W)?(\d+(?:\.\d+)?D)?(T(?=\d)(\d+(?:\.\d+)?H)?(\d+(?:\.\d+)?M)?(\d+(?:\.\d+)?S)?)?$/', $testString) === 1;
 	}
 
-	public function parse(string $argument, CommandSender $sender) : mixed{
+	public function parse(string $argument, CommandSender $sender) : string{
 		return $argument;
 	}
 

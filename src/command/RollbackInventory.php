@@ -6,6 +6,8 @@ namespace jasonw4331\InventoryRollbacks\command;
 
 use CortexPE\Commando\BaseCommand;
 use CortexPE\Commando\constraint\InGameRequiredConstraint;
+use DateInterval;
+use DateTime;
 use jasonw4331\InventoryRollbacks\command\argument\ISO8601Argument;
 use jasonw4331\InventoryRollbacks\command\argument\PlayerTargetArgument;
 use jasonw4331\InventoryRollbacks\lang\CustomKnownTranslationFactory;
@@ -19,7 +21,7 @@ use function time;
 
 final class RollbackInventory extends BaseCommand{
 
-	public function __construct(private Main $plugin){
+	public function __construct(private readonly Main $plugin){
 		parent::__construct(
 			$plugin,
 			"rollbackinventory",
@@ -52,7 +54,7 @@ final class RollbackInventory extends BaseCommand{
 		$this->plugin->showTransactionsMenu(
 			$sender,
 			$args['player'],
-			isset($args[1]) ? (new \DateTime())->sub(new \DateInterval($args['time']))->getTimestamp() : time()
+			isset($args[1]) ? (new DateTime())->sub(new DateInterval($args['time']))->getTimestamp() : time()
 		);
 	}
 }
