@@ -21,7 +21,7 @@ use function time;
 
 final class RollbackInventory extends BaseCommand{
 
-	public function __construct(private readonly Main $plugin){
+	public function __construct(Main $plugin){
 		parent::__construct(
 			$plugin,
 			"rollbackinventory",
