@@ -12,6 +12,11 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Main.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Call to an undefined method pocketmine\\\\plugin\\\\Plugin\\:\\:showTransactionsMenu\\(\\)\\.$#',
+	'count' => 1,
+	'path' => __DIR__ . '/src/command/RollbackInventory.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Offset 1 on array\\{player\\: pocketmine\\\\player\\\\OfflinePlayer\\|pocketmine\\\\player\\\\Player, time\\: string\\|null\\} in isset\\(\\) does not exist\\.$#',
 	'count' => 1,
 	'path' => __DIR__ . '/src/command/RollbackInventory.php',
