@@ -19,6 +19,6 @@ projects:
         version: ^4.6.0
       - src: jasonw4331/libCustomPack/libCustomPack
         version: ^1.0.1
-      - src: CortexPE/Commando/Commando
-        version: ^3.2.0
+      - src: Paroxity/Commando/Commando
+        version: ^3.1.0
 ...
