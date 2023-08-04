@@ -20,5 +20,5 @@ projects:
       - src: jasonw4331/libCustomPack/libCustomPack
         version: ^1.0.1
       - src: CortexPE/Commando/Commando
-        version: ^3.0.0
+        version: ^3.2.0
 ...

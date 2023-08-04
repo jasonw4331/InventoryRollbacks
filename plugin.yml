@@ -2,7 +2,7 @@ name: InventoryRollbacks
 main: jasonw4331\InventoryRollbacks\Main
 src-namespace-prefix: jasonw4331\InventoryRollbacks
 version: 1.0.0
-api: 5.0.0
+api: 5.3.0
 description: "A plugin which allows players to politely ask for a teleport"
 author: "jasonw4331"
 
